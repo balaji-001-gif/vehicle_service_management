@@ -465,7 +465,8 @@
 								{% if r.payment_status == 'Paid' %}
 									<span class="badge-paid">✓ Paid</span>
 								{% elif r.status in ['Repairing Done', 'Released'] %}
-									<button class="btn-pay" onclick="processPayment('{{ r.name }}')">Pay Now</button>
+									<a href="upi://pay?pa=merchant@upi&pn=Vehicle+Service&am={{ r.cost }}&tr={{ r.name }}&cu=INR" class="btn-pay" style="text-decoration: none;" onclick="showConfirmPayment('{{ r.name }}')">Pay via UPI</a>
+									<button id="btn-confirm-{{ r.name }}" class="btn-pay" style="display: none; background: #3b82f6; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);" onclick="processPayment('{{ r.name }}')">Verify Payment</button>
 								{% else %}
 									<span style="font-size: 0.75rem; color: #f59e0b; margin-left: 0.5rem; font-weight: 700;">Unpaid</span>
 								{% endif %}
@@ -555,6 +556,13 @@ function approveQuote(reqName) {
 			}
 		}
 	});
+}
+
+function showConfirmPayment(reqName) {
+	setTimeout(() => {
+		let btn = document.getElementById('btn-confirm-' + reqName);
+		if (btn) btn.style.display = 'inline-block';
+	}, 1500);
 }
 
 function submitFeedback(reqName) {

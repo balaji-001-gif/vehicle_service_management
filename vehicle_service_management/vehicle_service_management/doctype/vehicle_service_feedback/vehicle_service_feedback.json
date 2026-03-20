@@ -8,11 +8,12 @@
  "engine": "InnoDB",
  "field_order": [
   "date",
-  "by_customer",
+  "customer",
   "column_break_1",
   "service_request",
   "section_message",
-  "message"
+  "rating",
+  "comments"
  ],
  "fields": [
   {
@@ -23,10 +24,10 @@
    "label": "Date"
   },
   {
-   "fieldname": "by_customer",
+   "fieldname": "customer",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "By Customer",
+   "label": "Customer",
    "options": "Customer"
   },
   {
@@ -45,11 +46,17 @@
    "label": "Feedback"
   },
   {
-   "fieldname": "message",
-   "fieldtype": "Small Text",
+   "fieldname": "rating",
+   "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Message",
+   "label": "Rating",
+   "options": "5\n4\n3\n2\n1",
    "reqd": 1
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Small Text",
+   "label": "Comments"
   }
  ],
  "index_web_pages_for_search": 1,
