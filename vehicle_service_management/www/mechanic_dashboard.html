@@ -1,0 +1,314 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Mechanic Dashboard{% endblock %}
+
+{% block head_include %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+	--bg: #f1f5f9;
+	--card: #ffffff;
+	--text: #1e293b;
+	--text-muted: #64748b;
+	--border: #e2e8f0;
+	--primary: #2563eb;
+	--completed: #22c55e;
+	--current: #3b82f6;
+	--pending-color: #d1d5db;
+	--shadow: 0 1px 3px rgba(0,0,0,0.08);
+	--shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; }
+.mech-page {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	background: var(--bg);
+	min-height: 100vh;
+	padding: 0;
+}
+.mech-header {
+	background: linear-gradient(135deg, #1e3a5f 0%, #0f766e 100%);
+	color: white;
+	padding: 2rem 1.5rem;
+	text-align: center;
+}
+.mech-header h1 {
+	font-size: 1.4rem;
+	font-weight: 700;
+	margin: 0 0 0.25rem;
+	color: white;
+}
+.mech-header p {
+	font-size: 0.875rem;
+	opacity: 0.85;
+	margin: 0;
+}
+.mech-content {
+	max-width: 600px;
+	margin: 0 auto;
+	padding: 1.25rem 1rem 2rem;
+}
+.section-title {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 1rem;
+}
+
+/* Request Card */
+.req-card {
+	background: var(--card);
+	border-radius: 14px;
+	box-shadow: var(--shadow-lg);
+	margin-bottom: 1rem;
+	overflow: hidden;
+	transition: box-shadow 0.2s;
+}
+.req-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+.req-header {
+	padding: 1rem 1.25rem 0.75rem;
+	border-bottom: 1px solid var(--border);
+}
+.req-header .vehicle {
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: var(--text);
+	margin: 0 0 0.15rem;
+}
+.req-header .info {
+	font-size: 0.8rem;
+	color: var(--text-muted);
+	margin: 0;
+}
+.req-header .id-badge {
+	font-size: 0.72rem;
+	color: var(--primary);
+	font-weight: 600;
+	margin-top: 0.25rem;
+}
+
+/* Status Badge */
+.status-badge {
+	display: inline-block;
+	padding: 0.2rem 0.65rem;
+	border-radius: 20px;
+	font-size: 0.72rem;
+	font-weight: 600;
+	margin-top: 0.4rem;
+}
+.status-badge.pending         { background: #fef3c7; color: #92400e; }
+.status-badge.approved        { background: #dbeafe; color: #1e40af; }
+.status-badge.repairing       { background: #fce7f3; color: #9d174d; }
+.status-badge.repairing-done  { background: #d1fae5; color: #065f46; }
+.status-badge.released        { background: #dcfce7; color: #166534; }
+
+/* Stepper */
+.stepper {
+	padding: 1rem 1.25rem;
+}
+.stepper-steps {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	position: relative;
+}
+.stepper-steps::before {
+	content: '';
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	right: 12px;
+	height: 3px;
+	background: var(--pending-color);
+	z-index: 0;
+}
+.h-step {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	z-index: 1;
+	flex: 1;
+}
+.h-circle {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: var(--pending-color);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.6rem;
+	color: white;
+	font-weight: 700;
+	margin-bottom: 0.35rem;
+}
+.h-step.completed .h-circle {
+	background: var(--completed);
+}
+.h-step.current .h-circle {
+	background: var(--current);
+	animation: pulse 2s ease-out infinite;
+	box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+}
+@keyframes pulse {
+	0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+	70% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+.h-label {
+	font-size: 0.6rem;
+	font-weight: 500;
+	color: var(--text-muted);
+	text-align: center;
+	max-width: 60px;
+	line-height: 1.2;
+}
+.h-step.completed .h-label { color: var(--completed); font-weight: 600; }
+.h-step.current .h-label { color: var(--current); font-weight: 700; }
+
+/* Action Buttons */
+.req-actions {
+	padding: 0.75rem 1.25rem 1rem;
+	border-top: 1px solid var(--border);
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+.btn-status {
+	padding: 0.45rem 0.85rem;
+	border-radius: 8px;
+	border: 1px solid var(--border);
+	font-size: 0.78rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.15s;
+	font-family: inherit;
+	background: white;
+	color: var(--text);
+}
+.btn-status:hover {
+	background: var(--primary);
+	color: white;
+	border-color: var(--primary);
+}
+.btn-status.active-status {
+	background: var(--primary);
+	color: white;
+	border-color: var(--primary);
+	cursor: default;
+}
+
+/* Details */
+.req-details {
+	padding: 0.5rem 1.25rem 1rem;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.5rem;
+}
+.detail .lbl {
+	font-size: 0.7rem;
+	color: var(--text-muted);
+	font-weight: 500;
+}
+.detail .val {
+	font-size: 0.85rem;
+	color: var(--text);
+	font-weight: 600;
+}
+
+.no-data {
+	text-align: center;
+	padding: 4rem 2rem;
+	color: var(--text-muted);
+}
+.no-data .icon { font-size: 3rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="mech-page">
+	<div class="mech-header">
+		<h1>🔩 Mechanic Dashboard</h1>
+		<p>Welcome, {{ mechanic_name or frappe.session.user }}</p>
+	</div>
+
+	<div class="mech-content">
+		{% if requests %}
+		<div class="section-title">Your Assigned Requests ({{ requests | length }})</div>
+		{% for r in requests %}
+		<div class="req-card" data-request="{{ r.name }}">
+			<div class="req-header">
+				<div class="vehicle">{{ r.vehicle_name }} {{ r.vehicle_model }}</div>
+				<div class="info">{{ r.vehicle_brand }} · {{ r.category or '' }} · {{ r.vehicle_no }}</div>
+				<div class="id-badge">{{ r.name }}</div>
+				<span class="status-badge {{ r.status | lower | replace(' ', '-') }}">{{ r.status }}</span>
+			</div>
+
+			<!-- Horizontal Stepper -->
+			<div class="stepper">
+				<div class="stepper-steps">
+					{% for s in r.stations %}
+					<div class="h-step {% if s.completed %}completed{% elif s.current %}current{% endif %}">
+						<div class="h-circle">{% if s.completed %}✓{% else %}{{ loop.index }}{% endif %}</div>
+						<div class="h-label">{{ s.name }}</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+
+			<div class="req-details">
+				<div class="detail">
+					<div class="lbl">Customer</div>
+					<div class="val">{{ r.customer_name or '-' }}</div>
+				</div>
+				<div class="detail">
+					<div class="lbl">Problem</div>
+					<div class="val">{{ r.problem_description[:50] }}{% if r.problem_description|length > 50 %}...{% endif %}</div>
+				</div>
+			</div>
+
+			<!-- Action Buttons -->
+			<div class="req-actions">
+				{% set statuses = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"] %}
+				{% for st in statuses %}
+				<button
+					class="btn-status {% if r.status == st %}active-status{% endif %}"
+					{% if r.status == st %}disabled{% endif %}
+					onclick="updateStatus('{{ r.name }}', '{{ st }}', this)"
+				>{{ st }}</button>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+		{% else %}
+		<div class="no-data">
+			<div class="icon">🔩</div>
+			<p>No service requests assigned to you yet.</p>
+		</div>
+		{% endif %}
+	</div>
+</div>
+
+<script>
+function updateStatus(requestName, newStatus, btn) {
+	if (btn.classList.contains('active-status')) return;
+
+	btn.textContent = '...';
+	frappe.call({
+		method: 'vehicle_service_management.api.update_request_status',
+		args: { request_name: requestName, new_status: newStatus },
+		callback: function(r) {
+			if (r.message && r.message.status === 'success') {
+				window.location.reload();
+			}
+		},
+		error: function() {
+			btn.textContent = newStatus;
+			alert('Failed to update status.');
+		}
+	});
+}
+</script>
+{% endblock %}

@@ -1,0 +1,412 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Track Your Vehicle Service{% endblock %}
+
+{% block head_include %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+	--color-completed: #22c55e;
+	--color-current: #3b82f6;
+	--color-pending: #d1d5db;
+	--color-bg: #f8fafc;
+	--color-card: #ffffff;
+	--color-text: #1e293b;
+	--color-text-muted: #64748b;
+	--color-border: #e2e8f0;
+	--color-primary: #2563eb;
+	--color-primary-hover: #1d4ed8;
+	--shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+	--shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+}
+
+* { box-sizing: border-box; }
+
+.tracker-page {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	background: var(--color-bg);
+	min-height: 100vh;
+	padding: 0;
+}
+
+/* Header */
+.tracker-header {
+	background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+	color: white;
+	padding: 2rem 1.5rem;
+	text-align: center;
+}
+.tracker-header h1 {
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin: 0 0 0.25rem 0;
+	color: white;
+}
+.tracker-header p {
+	font-size: 0.875rem;
+	opacity: 0.85;
+	margin: 0;
+}
+
+/* Search */
+.search-container {
+	padding: 1.25rem 1rem;
+	margin-top: -1rem;
+}
+.search-box {
+	background: var(--color-card);
+	border-radius: 16px;
+	box-shadow: var(--shadow-lg);
+	padding: 1.25rem;
+	max-width: 500px;
+	margin: 0 auto;
+}
+.search-box form {
+	display: flex;
+	gap: 0.5rem;
+}
+.search-box input[type="text"] {
+	flex: 1;
+	border: 2px solid var(--color-border);
+	border-radius: 12px;
+	padding: 0.75rem 1rem;
+	font-size: 0.95rem;
+	font-family: inherit;
+	outline: none;
+	transition: border-color 0.2s;
+	color: var(--color-text);
+}
+.search-box input[type="text"]:focus {
+	border-color: var(--color-primary);
+}
+.search-box input[type="text"]::placeholder {
+	color: var(--color-text-muted);
+}
+.search-box button {
+	background: var(--color-primary);
+	color: white;
+	border: none;
+	border-radius: 12px;
+	padding: 0.75rem 1.25rem;
+	font-size: 0.95rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s;
+	font-family: inherit;
+	white-space: nowrap;
+}
+.search-box button:hover {
+	background: var(--color-primary-hover);
+}
+
+/* Results */
+.results-container {
+	padding: 0 1rem 2rem;
+	max-width: 500px;
+	margin: 0 auto;
+}
+.no-results {
+	text-align: center;
+	padding: 3rem 1rem;
+	color: var(--color-text-muted);
+}
+.no-results .icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+/* Request Card */
+.request-card {
+	background: var(--color-card);
+	border-radius: 16px;
+	box-shadow: var(--shadow-md);
+	margin-bottom: 1.25rem;
+	overflow: hidden;
+	transition: box-shadow 0.2s;
+}
+.request-card:hover {
+	box-shadow: var(--shadow-lg);
+}
+.card-header {
+	padding: 1.25rem 1.25rem 0.75rem;
+	border-bottom: 1px solid var(--color-border);
+}
+.card-header .vehicle-name {
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: var(--color-text);
+	margin: 0 0 0.25rem 0;
+}
+.card-header .vehicle-info {
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+	margin: 0;
+}
+.card-header .request-id {
+	font-size: 0.75rem;
+	color: var(--color-primary);
+	font-weight: 600;
+	margin-top: 0.25rem;
+}
+
+/* Status Badge */
+.status-badge {
+	display: inline-block;
+	padding: 0.25rem 0.75rem;
+	border-radius: 20px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	margin-top: 0.5rem;
+}
+.status-badge.pending { background: #fef3c7; color: #92400e; }
+.status-badge.approved { background: #dbeafe; color: #1e40af; }
+.status-badge.repairing { background: #fce7f3; color: #9d174d; }
+.status-badge.repairing-done { background: #d1fae5; color: #065f46; }
+.status-badge.released { background: #dcfce7; color: #166534; }
+
+/* Stepper / Timeline */
+.stepper {
+	padding: 1.25rem;
+}
+.stepper-title {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--color-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin: 0 0 1rem 0;
+}
+.stepper-steps {
+	position: relative;
+	padding-left: 28px;
+}
+.step {
+	position: relative;
+	padding-bottom: 1.5rem;
+	padding-left: 1rem;
+}
+.step:last-child {
+	padding-bottom: 0;
+}
+/* Vertical line */
+.step::before {
+	content: '';
+	position: absolute;
+	left: -22px;
+	top: 12px;
+	width: 2px;
+	height: calc(100%);
+	background: var(--color-pending);
+}
+.step:last-child::before {
+	display: none;
+}
+.step.completed::before {
+	background: var(--color-completed);
+}
+.step.current::before {
+	background: linear-gradient(to bottom, var(--color-current) 0%, var(--color-pending) 100%);
+}
+/* Circle */
+.step-circle {
+	position: absolute;
+	left: -28px;
+	top: 2px;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--color-pending);
+	border: 2px solid var(--color-pending);
+	z-index: 1;
+}
+.step.completed .step-circle {
+	background: var(--color-completed);
+	border-color: var(--color-completed);
+}
+.step.completed .step-circle::after {
+	content: '✓';
+	color: white;
+	font-size: 0.55rem;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+.step.current .step-circle {
+	background: var(--color-current);
+	border-color: var(--color-current);
+	animation: pulse-ring 2s ease-out infinite;
+	box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+}
+
+@keyframes pulse-ring {
+	0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+	70% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+.step-label {
+	font-size: 0.9rem;
+	font-weight: 500;
+	color: var(--color-text-muted);
+}
+.step.completed .step-label {
+	color: var(--color-completed);
+	font-weight: 600;
+}
+.step.current .step-label {
+	color: var(--color-current);
+	font-weight: 700;
+}
+
+/* Details row */
+.card-details {
+	padding: 0.75rem 1.25rem 1.25rem;
+	border-top: 1px solid var(--color-border);
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem;
+}
+.detail-item {
+	font-size: 0.8rem;
+}
+.detail-item .label {
+	color: var(--color-text-muted);
+	font-weight: 500;
+	display: block;
+	margin-bottom: 0.15rem;
+}
+.detail-item .value {
+	color: var(--color-text);
+	font-weight: 600;
+}
+
+/* Empty state */
+.empty-state {
+	text-align: center;
+	padding: 4rem 2rem;
+	color: var(--color-text-muted);
+}
+.empty-state svg {
+	width: 80px;
+	height: 80px;
+	margin-bottom: 1rem;
+	opacity: 0.4;
+}
+.empty-state p {
+	font-size: 0.95rem;
+	margin: 0;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+	.tracker-header { padding: 3rem 2rem; }
+	.tracker-header h1 { font-size: 2rem; }
+	.search-container { padding: 1.5rem 2rem; }
+	.results-container { padding: 0 2rem 3rem; }
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="tracker-page">
+	<!-- Header -->
+	<div class="tracker-header">
+		<h1>🔧 Track Your Vehicle Service</h1>
+		<p>Enter your vehicle number or mobile to check status</p>
+	</div>
+
+	<!-- Search -->
+	<div class="search-container">
+		<div class="search-box">
+			<form method="GET" action="/service-tracking">
+				<input
+					type="text"
+					name="q"
+					placeholder="Vehicle No. or Mobile No."
+					value="{{ search_term or '' }}"
+					autocomplete="off"
+				/>
+				<button type="submit">Track</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Results -->
+	<div class="results-container">
+		{% if search_term and not results %}
+			<div class="no-results">
+				<div class="icon">🔍</div>
+				<p>No service requests found for <strong>"{{ search_term }}"</strong></p>
+				<p style="font-size: 0.85rem; margin-top: 0.5rem;">Try your vehicle number (e.g. TN-01-AB-1234) or registered mobile number</p>
+			</div>
+		{% endif %}
+
+		{% if results %}
+			{% for r in results %}
+			<div class="request-card">
+				<!-- Card Header -->
+				<div class="card-header">
+					<div class="vehicle-name">{{ r.vehicle_name }} {{ r.vehicle_model }}</div>
+					<div class="vehicle-info">{{ r.vehicle_brand }} · {{ r.category or '' }} · {{ r.vehicle_no }}</div>
+					<div class="request-id">{{ r.name }}</div>
+					<span class="status-badge {{ r.status | lower | replace(' ', '-') }}">{{ r.status }}</span>
+				</div>
+
+				<!-- Stepper -->
+				<div class="stepper">
+					<div class="stepper-title">Service Progress</div>
+					<div class="stepper-steps">
+						{% for station in r.stations %}
+						<div class="step {% if station.completed %}completed{% elif station.current %}current{% else %}pending{% endif %}">
+							<div class="step-circle"></div>
+							<div class="step-label">{{ station.name }}</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+
+				<!-- Details -->
+				<div class="card-details">
+					<div class="detail-item">
+						<span class="label">Customer</span>
+						<span class="value">{{ r.customer_name or '-' }}</span>
+					</div>
+					<div class="detail-item">
+						<span class="label">Date</span>
+						<span class="value">{{ r.date or '-' }}</span>
+					</div>
+					<div class="detail-item">
+						<span class="label">Mechanic</span>
+						<span class="value">{{ r.mechanic_name or 'Not Assigned' }}</span>
+					</div>
+					<div class="detail-item">
+						<span class="label">Cost</span>
+						<span class="value">{{ '₹ ' ~ r.cost if r.cost else 'Pending' }}</span>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		{% endif %}
+
+		{% if not search_term %}
+			<div class="empty-state">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+						d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0
+						01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621
+						0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0
+						00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554
+						48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0
+						0V9.75" />
+				</svg>
+				<p>Enter your vehicle number or mobile to get started</p>
+			</div>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:MECH-{####}",
+ "creation": "2024-03-20 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_personal",
+  "user",
+  "mechanic_name",
+  "column_break_1",
+  "mobile",
+  "address",
+  "section_professional",
+  "skill",
+  "column_break_2",
+  "salary",
+  "status",
+  "section_image",
+  "profile_pic"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_personal",
+   "fieldtype": "Section Break",
+   "label": "Personal Details"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "user.full_name",
+   "fieldname": "mechanic_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Mechanic Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mobile",
+   "fieldtype": "Phone",
+   "label": "Mobile"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "section_professional",
+   "fieldtype": "Section Break",
+   "label": "Professional Details"
+  },
+  {
+   "fieldname": "skill",
+   "fieldtype": "Small Text",
+   "label": "Skill"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Currency",
+   "label": "Salary"
+  },
+  {
+   "default": "0",
+   "fieldname": "status",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "fieldname": "section_image",
+   "fieldtype": "Section Break",
+   "label": "Image"
+  },
+  {
+   "fieldname": "profile_pic",
+   "fieldtype": "Attach Image",
+   "label": "Profile Picture"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-03-20 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Vehicle Service Management",
+ "name": "Vehicle Mechanic",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "mechanic_name",
+ "show_title_field_in_link": 1
+}

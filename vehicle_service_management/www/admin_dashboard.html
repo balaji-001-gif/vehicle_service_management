@@ -1,0 +1,289 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Admin Dashboard — Vehicle Service Management{% endblock %}
+
+{% block head_include %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+	--bg: #f1f5f9;
+	--card: #ffffff;
+	--text: #1e293b;
+	--text-muted: #64748b;
+	--border: #e2e8f0;
+	--primary: #2563eb;
+	--shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+	--shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.admin-page {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	background: var(--bg);
+	min-height: 100vh;
+}
+
+/* Layout */
+.admin-layout {
+	display: flex;
+	min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+	width: 240px;
+	background: var(--card);
+	border-right: 1px solid var(--border);
+	padding: 1.5rem 0;
+	flex-shrink: 0;
+}
+.sidebar-brand {
+	padding: 0 1.25rem 1.5rem;
+	font-weight: 700;
+	font-size: 0.95rem;
+	color: var(--text);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	border-bottom: 1px solid var(--border);
+}
+.sidebar-brand span { font-size: 1.25rem; }
+.sidebar-nav {
+	list-style: none;
+	padding: 1rem 0;
+}
+.sidebar-nav li a {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.7rem 1.25rem;
+	color: var(--text-muted);
+	text-decoration: none;
+	font-size: 0.9rem;
+	font-weight: 500;
+	transition: all 0.15s;
+	border-left: 3px solid transparent;
+}
+.sidebar-nav li a:hover,
+.sidebar-nav li a.active {
+	color: var(--primary);
+	background: #eff6ff;
+	border-left-color: var(--primary);
+}
+.sidebar-nav li a .icon { font-size: 1.1rem; width: 1.5rem; text-align: center; }
+
+/* Main */
+.admin-main {
+	flex: 1;
+	padding: 2rem;
+	overflow-x: auto;
+}
+.admin-main h1 {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--text);
+	margin-bottom: 1.5rem;
+}
+
+/* Stats Cards */
+.stats-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+.stat-card {
+	border-radius: 14px;
+	padding: 1.25rem;
+	color: white;
+	text-align: center;
+	box-shadow: var(--shadow-lg);
+	transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card .stat-icon {
+	font-size: 1.75rem;
+	margin-bottom: 0.5rem;
+	opacity: 0.9;
+}
+.stat-card .stat-number {
+	font-size: 2rem;
+	font-weight: 800;
+}
+.stat-card .stat-label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	opacity: 0.9;
+	margin-top: 0.25rem;
+}
+.stat-card.purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+.stat-card.green  { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.stat-card.orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+.stat-card.red    { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+/* Table */
+.table-card {
+	background: var(--card);
+	border-radius: 14px;
+	box-shadow: var(--shadow);
+	overflow: hidden;
+}
+.table-card .table-title {
+	padding: 1rem 1.5rem;
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--primary);
+	border-bottom: 1px solid var(--border);
+	text-align: center;
+}
+.table-card table {
+	width: 100%;
+	border-collapse: collapse;
+}
+.table-card th {
+	text-align: left;
+	padding: 0.75rem 1rem;
+	font-size: 0.78rem;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	border-bottom: 1px solid var(--border);
+	background: #f8fafc;
+}
+.table-card td {
+	padding: 0.75rem 1rem;
+	font-size: 0.875rem;
+	color: var(--text);
+	border-bottom: 1px solid var(--border);
+}
+.table-card tr:last-child td { border-bottom: none; }
+.table-card tr:hover td { background: #f8fafc; }
+
+/* Status Pill */
+.status-pill {
+	display: inline-block;
+	padding: 0.2rem 0.6rem;
+	border-radius: 12px;
+	font-size: 0.72rem;
+	font-weight: 600;
+}
+.status-pill.pending         { background: #fef3c7; color: #92400e; }
+.status-pill.approved        { background: #dbeafe; color: #1e40af; }
+.status-pill.repairing       { background: #fce7f3; color: #9d174d; }
+.status-pill.repairing-done  { background: #d1fae5; color: #065f46; }
+.status-pill.released        { background: #dcfce7; color: #166534; }
+
+/* No data */
+.no-data {
+	text-align: center;
+	padding: 3rem;
+	color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+	.admin-sidebar { display: none; }
+	.admin-main { padding: 1rem; }
+	.stats-grid { grid-template-columns: repeat(2, 1fr); }
+	.admin-main h1 { font-size: 1.25rem; }
+}
+@media (max-width: 500px) {
+	.stats-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+	.stat-card { padding: 1rem; }
+	.stat-card .stat-number { font-size: 1.5rem; }
+	.table-card { font-size: 0.8rem; }
+	.table-card th, .table-card td { padding: 0.5rem 0.6rem; }
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="admin-page">
+	<div class="admin-layout">
+		<!-- Sidebar -->
+		<aside class="admin-sidebar">
+			<div class="sidebar-brand">
+				<span>🔧</span> Vehicle Service Mgmt
+			</div>
+			<ul class="sidebar-nav">
+				<li><a href="/admin-dashboard" class="active"><span class="icon">📊</span> Dashboard</a></li>
+				<li><a href="/app/customer"><span class="icon">👥</span> Customer</a></li>
+				<li><a href="/app/vehicle-mechanic"><span class="icon">🔩</span> Mechanic</a></li>
+				<li><a href="/app/vehicle-service-request"><span class="icon">📋</span> Request</a></li>
+				<li><a href="/app/vehicle-service-feedback"><span class="icon">💬</span> Feedback</a></li>
+			</ul>
+		</aside>
+
+		<!-- Main -->
+		<main class="admin-main">
+			<h1>Dashboard</h1>
+
+			<!-- Stats Cards -->
+			<div class="stats-grid">
+				<div class="stat-card purple">
+					<div class="stat-icon">👥</div>
+					<div class="stat-number">{{ total_customers }}</div>
+					<div class="stat-label">Total Customer</div>
+				</div>
+				<div class="stat-card green">
+					<div class="stat-icon">🔩</div>
+					<div class="stat-number">{{ total_mechanics }}</div>
+					<div class="stat-label">Total Mechanic</div>
+				</div>
+				<div class="stat-card orange">
+					<div class="stat-icon">📋</div>
+					<div class="stat-number">{{ total_enquiries }}</div>
+					<div class="stat-label">Total Enquiry</div>
+				</div>
+				<div class="stat-card red">
+					<div class="stat-icon">💬</div>
+					<div class="stat-number">{{ total_feedback }}</div>
+					<div class="stat-label">Total Feedback</div>
+				</div>
+			</div>
+
+			<!-- Recent Enquiries -->
+			<div class="table-card">
+				<div class="table-title">Recent Enquiry By Customer</div>
+				{% if recent_enquiries %}
+				<div style="overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+							<th>Customer Name</th>
+							<th>Vehicle Name</th>
+							<th>Category</th>
+							<th>Vehicle Model</th>
+							<th>Vehicle Brand</th>
+							<th>Problem Description</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for r in recent_enquiries %}
+						<tr>
+							<td>{{ r.customer_name }}</td>
+							<td>{{ r.vehicle_name }}</td>
+							<td>{{ r.category or '-' }}</td>
+							<td>{{ r.vehicle_model }}</td>
+							<td>{{ r.vehicle_brand }}</td>
+							<td>{{ r.problem_description }}</td>
+							<td>
+								<span class="status-pill {{ r.status | lower | replace(' ', '-') }}">
+									{{ r.status }}
+								</span>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				</div>
+				{% else %}
+				<div class="no-data">No enquiries yet.</div>
+				{% endif %}
+			</div>
+		</main>
+	</div>
+</div>
+{% endblock %}

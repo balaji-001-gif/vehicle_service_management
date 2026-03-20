@@ -1,0 +1,161 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:VSR-{####}",
+ "creation": "2024-03-20 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_general",
+  "customer",
+  "date",
+  "column_break_general",
+  "status",
+  "section_vehicle",
+  "vehicle_name",
+  "vehicle_brand",
+  "column_break_vehicle",
+  "vehicle_model",
+  "vehicle_no",
+  "category",
+  "section_problem",
+  "problem_description",
+  "section_service",
+  "mechanic",
+  "column_break_service",
+  "cost"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_general",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date"
+  },
+  {
+   "fieldname": "column_break_general",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Pending\nApproved\nRepairing\nRepairing Done\nReleased"
+  },
+  {
+   "fieldname": "section_vehicle",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Details"
+  },
+  {
+   "fieldname": "vehicle_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "vehicle_brand",
+   "fieldtype": "Data",
+   "label": "Vehicle Brand",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vehicle",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_model",
+   "fieldtype": "Data",
+   "label": "Vehicle Model",
+   "reqd": 1
+  },
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Data",
+   "label": "Vehicle Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "\ntwo wheeler with gear\ntwo wheeler without gear\nthree wheeler\nfour wheeler"
+  },
+  {
+   "fieldname": "section_problem",
+   "fieldtype": "Section Break",
+   "label": "Problem Details"
+  },
+  {
+   "fieldname": "problem_description",
+   "fieldtype": "Small Text",
+   "label": "Problem Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_service",
+   "fieldtype": "Section Break",
+   "label": "Service Assignment"
+  },
+  {
+   "fieldname": "mechanic",
+   "fieldtype": "Link",
+   "label": "Mechanic",
+   "options": "Vehicle Mechanic"
+  },
+  {
+   "fieldname": "column_break_service",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cost",
+   "fieldtype": "Currency",
+   "label": "Cost"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-03-20 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Vehicle Service Management",
+ "name": "Vehicle Service Request",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "vehicle_name",
+ "show_title_field_in_link": 1
+}
