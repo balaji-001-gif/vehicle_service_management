@@ -22,7 +22,7 @@ def get_service_status(search_term=None):
 		fields=[
 			"name", "vehicle_name", "vehicle_brand", "vehicle_model",
 			"vehicle_no", "category", "problem_description",
-			"status", "date", "cost", "customer", "mechanic", "payment_status"
+			"status", "date", "cost", "customer", "mechanic", "payment_status", "quotation_approved"
 		],
 		order_by="modified desc",
 		limit=10
@@ -34,7 +34,7 @@ def get_service_status(search_term=None):
 		mechanics_or_customers = frappe.db.sql("""
 			SELECT vsr.name, vsr.vehicle_name, vsr.vehicle_brand, vsr.vehicle_model,
 				vsr.vehicle_no, vsr.category, vsr.problem_description,
-				vsr.status, vsr.date, vsr.cost, vsr.customer, vsr.mechanic, vsr.payment_status
+				vsr.status, vsr.date, vsr.cost, vsr.customer, vsr.mechanic, vsr.payment_status, vsr.quotation_approved
 			FROM `tabVehicle Service Request` vsr
 			LEFT JOIN `tabCustomer` c ON c.name = vsr.customer
 			WHERE c.mobile_no LIKE %(search)s
@@ -46,8 +46,9 @@ def get_service_status(search_term=None):
 			results = mechanics_or_customers
 
 	# Add workflow station info to each result
-	stations = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"]
+	stations = ["Pending", "Quoted", "Approved", "Repairing", "Repairing Done", "Released"]
 	for r in results:
+		r["has_feedback"] = frappe.db.exists("Vehicle Service Feedback", {"service_request": r.name})
 		current_index = stations.index(r.get("status", "Pending")) if r.get("status") in stations else 0
 		r["stations"] = []
 		for i, station in enumerate(stations):
@@ -80,7 +81,7 @@ def get_admin_stats():
 		fields=[
 			"name", "customer", "vehicle_name", "category",
 			"vehicle_model", "vehicle_brand", "problem_description",
-			"status", "date", "mechanic", "payment_status"
+			"status", "date", "mechanic", "payment_status", "quotation_approved"
 		],
 		order_by="creation desc",
 		limit=20
@@ -118,13 +119,13 @@ def get_mechanic_requests():
 		fields=[
 			"name", "customer", "vehicle_name", "vehicle_brand", "vehicle_model",
 			"vehicle_no", "category", "problem_description",
-			"status", "date", "cost", "payment_status"
+			"status", "date", "cost", "payment_status", "quotation_approved"
 		],
 		order_by="modified desc",
 		limit=50
 	)
 
-	stations = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"]
+	stations = ["Pending", "Quoted", "Approved", "Repairing", "Repairing Done", "Released"]
 	for r in requests:
 		r["customer_name"] = frappe.db.get_value("Customer", r.get("customer"), "customer_name") or r.get("customer", "")
 		current_index = stations.index(r.get("status", "Pending")) if r.get("status") in stations else 0
@@ -155,7 +156,7 @@ def update_request_status(request_name, new_status):
 	if doc.mechanic != mechanic and not is_admin:
 		frappe.throw("You are not authorized to update this request.")
 
-	valid_statuses = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"]
+	valid_statuses = ["Pending", "Quoted", "Approved", "Repairing", "Repairing Done", "Released"]
 	if new_status not in valid_statuses:
 		frappe.throw(f"Invalid status: {new_status}")
 
@@ -232,3 +233,45 @@ def book_service(customer_name, mobile, vehicle_name, vehicle_brand, vehicle_mod
 		"request_id": req.name,
 		"message": f"Service request {req.name} created successfully!"
 	}
+
+
+@frappe.whitelist(allow_guest=True)
+def approve_quotation(request_name):
+	"""
+	Allow customers to explicitly approve the quotation cost.
+	"""
+	doc = frappe.get_doc("Vehicle Service Request", request_name)
+	if doc.quotation_approved:
+		return {"status": "success"}
+	
+	doc.quotation_approved = 1
+	doc.status = "Approved"
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	
+	return {"status": "success"}
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_feedback(request_name, rating, comments):
+	"""
+	Allow customers to submit auto-feedback after payment.
+	"""
+	doc = frappe.get_doc("Vehicle Service Request", request_name)
+	if not rating:
+		frappe.throw("Rating is required.")
+
+	if frappe.db.exists("Vehicle Service Feedback", {"service_request": request_name}):
+		frappe.throw("Feedback already submitted for this request.")
+
+	fb = frappe.get_doc({
+		"doctype": "Vehicle Service Feedback",
+		"service_request": request_name,
+		"customer": doc.customer,
+		"rating": rating,
+		"comments": comments
+	})
+	fb.insert(ignore_permissions=True)
+	frappe.db.commit()
+	
+	return {"status": "success"}

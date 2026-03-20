@@ -25,7 +25,8 @@
   "mechanic",
   "column_break_service",
   "cost",
-  "payment_status"
+  "payment_status",
+  "quotation_approved"
  ],
  "fields": [
   {
@@ -58,7 +59,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Pending\nApproved\nRepairing\nRepairing Done\nReleased"
+   "options": "Pending\nQuoted\nApproved\nRepairing\nRepairing Done\nReleased"
   },
   {
    "fieldname": "section_vehicle",
@@ -137,6 +138,12 @@
    "fieldtype": "Select",
    "label": "Payment Status",
    "options": "Unpaid\nPaid"
+  },
+  {
+   "default": "0",
+   "fieldname": "quotation_approved",
+   "fieldtype": "Check",
+   "label": "Quotation Approved"
   }
  ],
  "index_web_pages_for_search": 1,

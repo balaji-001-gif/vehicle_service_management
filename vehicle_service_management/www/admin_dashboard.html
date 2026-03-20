@@ -293,7 +293,7 @@
 							<td class="action-cell">
 								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">
 									<option value="" disabled selected>Update...</option>
-									{% set statuses = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"] %}
+									{% set statuses = ["Pending", "Quoted", "Approved", "Repairing", "Repairing Done", "Released"] %}
 									{% for st in statuses %}
 									{% if r.status != st %}
 									<option value="{{ st }}">{{ st }}</option>
@@ -423,7 +423,7 @@
 							<td class="action-cell">
 								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">
 									<option value="" disabled selected>Update...</option>
-									{% set statuses = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"] %}
+									{% set statuses = ["Pending", "Quoted", "Approved", "Repairing", "Repairing Done", "Released"] %}
 									{% for st in statuses %}
 									{% if r.status != st %}
 									<option value="{{ st }}">{{ st }}</option>
