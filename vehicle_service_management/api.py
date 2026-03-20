@@ -22,7 +22,7 @@ def get_service_status(search_term=None):
 		fields=[
 			"name", "vehicle_name", "vehicle_brand", "vehicle_model",
 			"vehicle_no", "category", "problem_description",
-			"status", "date", "cost", "customer", "mechanic"
+			"status", "date", "cost", "customer", "mechanic", "payment_status"
 		],
 		order_by="modified desc",
 		limit=10
@@ -34,7 +34,7 @@ def get_service_status(search_term=None):
 		mechanics_or_customers = frappe.db.sql("""
 			SELECT vsr.name, vsr.vehicle_name, vsr.vehicle_brand, vsr.vehicle_model,
 				vsr.vehicle_no, vsr.category, vsr.problem_description,
-				vsr.status, vsr.date, vsr.cost, vsr.customer, vsr.mechanic
+				vsr.status, vsr.date, vsr.cost, vsr.customer, vsr.mechanic, vsr.payment_status
 			FROM `tabVehicle Service Request` vsr
 			LEFT JOIN `tabCustomer` c ON c.name = vsr.customer
 			WHERE c.mobile_no LIKE %(search)s
@@ -80,7 +80,7 @@ def get_admin_stats():
 		fields=[
 			"name", "customer", "vehicle_name", "category",
 			"vehicle_model", "vehicle_brand", "problem_description",
-			"status", "date", "mechanic"
+			"status", "date", "mechanic", "payment_status"
 		],
 		order_by="creation desc",
 		limit=20
@@ -118,7 +118,7 @@ def get_mechanic_requests():
 		fields=[
 			"name", "customer", "vehicle_name", "vehicle_brand", "vehicle_model",
 			"vehicle_no", "category", "problem_description",
-			"status", "date", "cost"
+			"status", "date", "cost", "payment_status"
 		],
 		order_by="modified desc",
 		limit=50
@@ -151,18 +151,40 @@ def update_request_status(request_name, new_status):
 	doc = frappe.get_doc("Vehicle Service Request", request_name)
 
 	# Only the assigned mechanic or System Manager can update
-	if doc.mechanic != mechanic and "System Manager" not in frappe.get_roles(user):
+	is_admin = "System Manager" in frappe.get_roles(user)
+	if doc.mechanic != mechanic and not is_admin:
 		frappe.throw("You are not authorized to update this request.")
 
 	valid_statuses = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"]
 	if new_status not in valid_statuses:
 		frappe.throw(f"Invalid status: {new_status}")
 
+	if not is_admin:
+		# Mechanics can only set 'Repairing' and 'Repairing Done'
+		if new_status not in ["Repairing", "Repairing Done"]:
+			frappe.throw("Mechanics can only update status to 'Repairing' or 'Repairing Done'.")
+
 	doc.status = new_status
 	doc.save(ignore_permissions=True)
 	frappe.db.commit()
 
 	return {"status": "success", "new_status": new_status}
+
+
+@frappe.whitelist(allow_guest=True)
+def process_payment(request_name):
+	"""
+	Process a native payment (mark as Paid).
+	"""
+	doc = frappe.get_doc("Vehicle Service Request", request_name)
+	if doc.payment_status == "Paid":
+		frappe.throw("This service request is already paid.")
+	
+	doc.payment_status = "Paid"
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+
+	return {"status": "success"}
 
 
 @frappe.whitelist(allow_guest=True)

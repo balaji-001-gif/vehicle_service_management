@@ -24,7 +24,8 @@
   "section_service",
   "mechanic",
   "column_break_service",
-  "cost"
+  "cost",
+  "payment_status"
  ],
  "fields": [
   {
@@ -129,6 +130,13 @@
    "fieldname": "cost",
    "fieldtype": "Currency",
    "label": "Cost"
+  },
+  {
+   "default": "Unpaid",
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "label": "Payment Status",
+   "options": "Unpaid\nPaid"
   }
  ],
  "index_web_pages_for_search": 1,
