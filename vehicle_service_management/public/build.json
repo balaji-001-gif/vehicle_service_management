@@ -1,0 +1,8 @@
+{
+	"css/vehicle_service_management.css": [
+		"public/css/vehicle_service_management.css"
+	],
+	"js/vehicle_service_management.js": [
+		"public/js/vehicle_service_management.js"
+	]
+}
