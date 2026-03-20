@@ -221,16 +221,17 @@
 				<span>🔧</span> Vehicle Service Mgmt
 			</div>
 			<ul class="sidebar-nav">
-				<li><a href="/admin-dashboard" class="active"><span class="icon">📊</span> Dashboard</a></li>
-				<li><a href="/app/customer"><span class="icon">👥</span> Customer</a></li>
-				<li><a href="/app/vehicle-mechanic"><span class="icon">🔩</span> Mechanic</a></li>
-				<li><a href="/app/vehicle-service-request"><span class="icon">📋</span> Request</a></li>
-				<li><a href="/app/vehicle-service-feedback"><span class="icon">💬</span> Feedback</a></li>
+				<li><a href="/admin-dashboard?view=dashboard" class="{% if view == 'dashboard' %}active{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
+				<li><a href="/admin-dashboard?view=customers" class="{% if view == 'customers' %}active{% endif %}"><span class="icon">👥</span> Customer</a></li>
+				<li><a href="/admin-dashboard?view=mechanics" class="{% if view == 'mechanics' %}active{% endif %}"><span class="icon">🔩</span> Mechanic</a></li>
+				<li><a href="/admin-dashboard?view=requests" class="{% if view == 'requests' %}active{% endif %}"><span class="icon">📋</span> Request</a></li>
+				<li><a href="/admin-dashboard?view=feedback" class="{% if view == 'feedback' %}active{% endif %}"><span class="icon">💬</span> Feedback</a></li>
 			</ul>
 		</aside>
 
 		<!-- Main -->
 		<main class="admin-main">
+			{% if view == 'dashboard' %}
 			<h1>Dashboard</h1>
 
 			<!-- Stats Cards -->
@@ -309,6 +310,174 @@
 				<div class="no-data">No enquiries yet.</div>
 				{% endif %}
 			</div>
+
+			{% elif view == 'customers' %}
+			<h1>Customers</h1>
+			<div class="table-card">
+				<div class="table-title">Customer Directory</div>
+				{% if customers %}
+				<div style="overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+							<th>Customer ID</th>
+							<th>Name</th>
+							<th>Mobile No</th>
+							<th>Customer Type</th>
+							<th>Email</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for c in customers %}
+						<tr>
+							<td><strong>{{ c.name }}</strong></td>
+							<td>{{ c.customer_name }}</td>
+							<td>{{ c.mobile_no or '-' }}</td>
+							<td>{{ c.customer_type or '-' }}</td>
+							<td>{{ c.email_id or '-' }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				</div>
+				{% else %}
+				<div class="no-data">No customers found.</div>
+				{% endif %}
+			</div>
+
+			{% elif view == 'mechanics' %}
+			<h1>Mechanics</h1>
+			<div class="table-card">
+				<div class="table-title">Mechanic Roster</div>
+				{% if mechanics %}
+				<div style="overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+							<th>Mechanic ID</th>
+							<th>Name</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for m in mechanics %}
+						<tr>
+							<td><strong>{{ m.name }}</strong></td>
+							<td>{{ m.mechanic_name }}</td>
+							<td>
+								<span class="status-pill {% if m.status == 'Active' %}released{% else %}pending{% endif %}">
+									{{ m.status or 'Active' }}
+								</span>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				</div>
+				{% else %}
+				<div class="no-data">No mechanics found.</div>
+				{% endif %}
+			</div>
+
+			{% elif view == 'requests' %}
+			<h1>Service Requests</h1>
+			<div class="table-card">
+				<div class="table-title">All Requests</div>
+				{% if requests %}
+				<div style="overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Date</th>
+							<th>Customer</th>
+							<th>Vehicle</th>
+							<th>Mechanic</th>
+							<th>Cost</th>
+							<th>Payment</th>
+							<th>Status</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for r in requests %}
+						<tr>
+							<td><strong>{{ r.name }}</strong></td>
+							<td>{{ r.date }}</td>
+							<td>{{ r.customer_name }}</td>
+							<td>{{ r.vehicle_name }}<br><span style="color: var(--text-muted); font-size: 0.75rem;">{{ r.category or '' }}</span></td>
+							<td>{{ r.mechanic_name or '-' }}</td>
+							<td>{{ '₹ ' ~ r.cost if r.cost else '-' }}</td>
+							<td>
+								{% if r.payment_status == 'Paid' %}
+								<span class="status-pill released">Paid</span>
+								{% else %}
+								<span class="status-pill pending">Unpaid</span>
+								{% endif %}
+							</td>
+							<td>
+								<span class="status-pill {{ r.status | lower | replace(' ', '-') }}">
+									{{ r.status }}
+								</span>
+							</td>
+							<td class="action-cell">
+								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">
+									<option value="" disabled selected>Update...</option>
+									{% set statuses = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"] %}
+									{% for st in statuses %}
+									{% if r.status != st %}
+									<option value="{{ st }}">{{ st }}</option>
+									{% endif %}
+									{% endfor %}
+								</select>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				</div>
+				{% else %}
+				<div class="no-data">No requests found.</div>
+				{% endif %}
+			</div>
+
+			{% elif view == 'feedback' %}
+			<h1>Feedback</h1>
+			<div class="table-card">
+				<div class="table-title">Customer Feedback</div>
+				{% if feedback %}
+				<div style="overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Customer</th>
+							<th>Request ID</th>
+							<th>Rating</th>
+							<th>Comments</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for f in feedback %}
+						<tr>
+							<td>{{ frappe.utils.formatdate(f.creation) if f.creation else '-' }}</td>
+							<td>{{ f.customer_name }}</td>
+							<td><a href="/admin-dashboard?view=requests" style="color: var(--primary); font-weight: 500;">{{ f.service_request }}</a></td>
+							<td>
+								{% for i in range(f.rating | int) %}⭐{% endfor %}
+							</td>
+							<td>{{ f.comments or '' }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				</div>
+				{% else %}
+				<div class="no-data">No feedback found.</div>
+				{% endif %}
+			</div>
+
+			{% endif %}
 		</main>
 	</div>
 </div>
