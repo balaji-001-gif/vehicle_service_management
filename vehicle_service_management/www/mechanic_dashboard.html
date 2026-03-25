@@ -218,6 +218,58 @@
 	font-weight: 600;
 }
 
+/* Service Bays */
+.bays-container {
+	padding: 0 1.25rem 1rem;
+}
+.bay-title {
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	margin-bottom: 0.5rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.bay-list { margin-bottom: 0.75rem; }
+.bay-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.5rem 0.75rem;
+	background: #f8fafc;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	margin-bottom: 0.4rem;
+}
+.bay-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+.bay-status-select {
+	padding: 0.25rem 0.5rem;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	font-size: 0.7rem;
+	font-weight: 600;
+	background: white;
+	outline: none;
+	cursor: pointer;
+}
+.bay-status-select.completed { border-color: var(--completed); color: var(--completed); }
+.bay-status-select.in-progress { border-color: var(--current); color: var(--current); }
+.btn-add-bay {
+	background: none;
+	border: 1px dashed var(--border);
+	border-radius: 8px;
+	padding: 0.4rem;
+	width: 100%;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--primary);
+	cursor: pointer;
+	transition: all 0.15s;
+}
+.btn-add-bay:hover { border-color: var(--primary); background: #eff6ff; }
+
 .no-data {
 	text-align: center;
 	padding: 4rem 2rem;
@@ -269,9 +321,33 @@
 				</div>
 			</div>
 
+			</div>
+
+			<!-- Service Bays -->
+			{% if r.status in ['Quoted', 'Approved', 'Repairing'] %}
+			<div class="bays-container">
+				<div class="bay-title">
+					<span>Service Operations</span>
+				</div>
+				<div class="bay-list">
+					{% for bay in r.service_bays %}
+					<div class="bay-item">
+						<span class="bay-name">{{ bay.bay_name }}</span>
+						<select class="bay-status-select {% if bay.bay_status == 'Completed' %}completed{% elif bay.bay_status == 'In Progress' %}in-progress{% endif %}" onchange="updateBayStatus('{{ r.name }}', '{{ bay.name }}', this.value)">
+							<option value="Pending" {% if bay.bay_status == 'Pending' %}selected{% endif %}>Pending</option>
+							<option value="In Progress" {% if bay.bay_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+							<option value="Completed" {% if bay.bay_status == 'Completed' %}selected{% endif %}>Completed</option>
+						</select>
+					</div>
+					{% endfor %}
+				</div>
+				<button class="btn-add-bay" onclick="addBay('{{ r.name }}')">+ Add Operation</button>
+			</div>
+			{% endif %}
+
 			<!-- Action Buttons -->
 			<div class="req-actions">
-				{% set statuses = ["Pending", "Approved", "Repairing", "Repairing Done", "Released"] %}
+				{% set statuses = ["Repairing", "Repairing Done"] %}
 				{% for st in statuses %}
 				<button
 					class="btn-status {% if r.status == st %}active-status{% endif %}"
@@ -307,6 +383,39 @@ function updateStatus(requestName, newStatus, btn) {
 		error: function() {
 			btn.textContent = newStatus;
 			alert('Failed to update status.');
+		}
+	});
+}
+
+function updateBayStatus(reqName, bayId, status) {
+	frappe.call({
+		method: 'vehicle_service_management.api.update_bay_status',
+		args: {
+			request_name: reqName,
+			bay_id: bayId,
+			bay_status: status
+		},
+		callback: function(r) {
+			if (r.message && r.message.status === 'success') {
+				// visually updated via css from dropdown change, no reload needed
+			}
+		}
+	});
+}
+
+function addBay(reqName) {
+	let bayName = prompt("Enter operation name (e.g., General Service, Painting, Water Wash):");
+	if (!bayName) return;
+	frappe.call({
+		method: 'vehicle_service_management.api.add_service_bay',
+		args: {
+			request_name: reqName,
+			bay_name: bayName
+		},
+		callback: function(r) {
+			if (r.message && r.message.status === 'success') {
+				window.location.reload();
+			}
 		}
 	});
 }

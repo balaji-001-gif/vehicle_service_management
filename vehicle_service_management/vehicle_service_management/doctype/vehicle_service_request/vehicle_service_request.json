@@ -26,7 +26,9 @@
   "column_break_service",
   "cost",
   "payment_status",
-  "quotation_approved"
+  "quotation_approved",
+  "section_bays",
+  "service_bays"
  ],
  "fields": [
   {
@@ -144,6 +146,17 @@
    "fieldname": "quotation_approved",
    "fieldtype": "Check",
    "label": "Quotation Approved"
+  },
+  {
+   "fieldname": "section_bays",
+   "fieldtype": "Section Break",
+   "label": "Operations & Bays"
+  },
+  {
+   "fieldname": "service_bays",
+   "fieldtype": "Table",
+   "label": "Service Bays",
+   "options": "Vehicle Service Bay"
   }
  ],
  "index_web_pages_for_search": 1,

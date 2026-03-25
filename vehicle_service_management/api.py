@@ -59,6 +59,7 @@ def get_service_status(search_term=None):
 				"pending": i > current_index,
 				"index": i
 			})
+		r["service_bays"] = frappe.db.get_all("Vehicle Service Bay", filters={"parent": r.name}, fields=["name", "bay_name", "bay_status"], order_by="idx asc")
 		r["customer_name"] = frappe.db.get_value("Customer", r.get("customer"), "customer_name") or r.get("customer", "")
 		r["mechanic_name"] = frappe.db.get_value("Vehicle Mechanic", r.get("mechanic"), "mechanic_name") or ""
 
@@ -137,6 +138,7 @@ def get_mechanic_requests():
 				"current": i == current_index,
 				"pending": i > current_index,
 			})
+		r["service_bays"] = frappe.db.get_all("Vehicle Service Bay", filters={"parent": r.name}, fields=["name", "bay_name", "bay_status"], order_by="idx asc")
 
 	return {"requests": requests, "mechanic_name": mechanic_name}
 
@@ -274,4 +276,55 @@ def submit_feedback(request_name, rating, comments):
 	fb.insert(ignore_permissions=True)
 	frappe.db.commit()
 	
+	return {"status": "success"}
+
+
+@frappe.whitelist()
+def update_bay_status(request_name, bay_id, bay_status):
+	"""
+	Allows mechanics to update a specific bay status within a vehicle service request.
+	"""
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	doc = frappe.get_doc("Vehicle Service Request", request_name)
+	
+	is_admin = "System Manager" in frappe.get_roles(user)
+	if doc.mechanic != mechanic and not is_admin:
+		frappe.throw("You are not authorized to update this request.")
+
+	updated = False
+	for bay in doc.service_bays:
+		if bay.name == bay_id:
+			bay.bay_status = bay_status
+			updated = True
+			break
+			
+	if not updated:
+		frappe.throw(f"Bay {bay_id} not found in this request.")
+		
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	return {"status": "success"}
+
+
+@frappe.whitelist()
+def add_service_bay(request_name, bay_name):
+	"""
+	Allows mechanics to dynamically add an operation to a vehicle service request.
+	"""
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	doc = frappe.get_doc("Vehicle Service Request", request_name)
+	
+	is_admin = "System Manager" in frappe.get_roles(user)
+	if doc.mechanic != mechanic and not is_admin:
+		frappe.throw("You are not authorized to modify this request.")
+
+	doc.append("service_bays", {
+		"bay_name": bay_name,
+		"bay_status": "Pending"
+	})
+	
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
 	return {"status": "success"}

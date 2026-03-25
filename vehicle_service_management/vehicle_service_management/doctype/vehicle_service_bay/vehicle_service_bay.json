@@ -1,0 +1,43 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-03-20 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "bay_name",
+  "bay_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "bay_name",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Bay Name",
+   "options": "General Service\nPainting\nWelding\nOil Service\nWater Wash\nElectrical\nInspection",
+   "reqd": 1
+  },
+  {
+   "default": "Pending",
+   "fieldname": "bay_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Pending\nIn Progress\nCompleted",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-03-20 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Vehicle Service Management",
+ "name": "Vehicle Service Bay",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -443,6 +443,27 @@
 					</div>
 				</div>
 
+				<!-- Service Bays (If any) -->
+				{% if r.service_bays %}
+				<div style="padding: 0 1.25rem 1rem;">
+					<div style="font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 0.75rem;">Service Operations</div>
+					<div style="display: flex; flex-direction: column; gap: 0.5rem;">
+						{% for bay in r.service_bays %}
+						<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: #f8fafc; border: 1px dashed var(--color-border); border-radius: 8px;">
+							<span style="font-size: 0.85rem; font-weight: 600;">{{ bay.bay_name }}</span>
+							{% if bay.bay_status == 'Completed' %}
+								<span style="font-size: 0.75rem; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 0.15rem 0.5rem; border-radius: 12px;">✓ Completed</span>
+							{% elif bay.bay_status == 'In Progress' %}
+								<span style="font-size: 0.75rem; font-weight: 700; color: #2563eb; background: #dbeafe; padding: 0.15rem 0.5rem; border-radius: 12px;">In Progress</span>
+							{% else %}
+								<span style="font-size: 0.75rem; font-weight: 600; color: #9ca3af;">Pending</span>
+							{% endif %}
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+				{% endif %}
+
 				<!-- Details -->
 				<div class="card-details">
 					<div class="detail-item">
