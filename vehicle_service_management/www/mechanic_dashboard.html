@@ -341,7 +341,19 @@
 					</div>
 					{% endfor %}
 				</div>
-				<button class="btn-add-bay" onclick="addBay('{{ r.name }}')">+ Add Operation</button>
+				<div id="add-bay-ui-{{ r.name }}" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+					<select id="new-bay-{{ r.name }}" style="flex: 1; padding: 0.4rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.75rem; outline: none;">
+						<option value="General Service">General Service</option>
+						<option value="Painting">Painting</option>
+						<option value="Welding">Welding</option>
+						<option value="Oil Service">Oil Service</option>
+						<option value="Water Wash">Water Wash</option>
+						<option value="Electrical">Electrical</option>
+						<option value="Inspection">Inspection</option>
+					</select>
+					<button onclick="submitNewBay('{{ r.name }}')" style="background: var(--primary); color: white; border: none; border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.75rem; font-weight: 600; cursor: pointer;">Add</button>
+				</div>
+				<button id="btn-add-{{ r.name }}" class="btn-add-bay" onclick="showAddBay('{{ r.name }}')">+ Add Operation</button>
 			</div>
 			{% endif %}
 
@@ -403,9 +415,13 @@ function updateBayStatus(reqName, bayId, status) {
 	});
 }
 
-function addBay(reqName) {
-	let bayName = prompt("Enter operation name (e.g., General Service, Painting, Water Wash):");
-	if (!bayName) return;
+function showAddBay(reqName) {
+	document.getElementById('btn-add-' + reqName).style.display = 'none';
+	document.getElementById('add-bay-ui-' + reqName).style.display = 'flex';
+}
+
+function submitNewBay(reqName) {
+	let bayName = document.getElementById('new-bay-' + reqName).value;
 	frappe.call({
 		method: 'vehicle_service_management.api.add_service_bay',
 		args: {
@@ -416,6 +432,9 @@ function addBay(reqName) {
 			if (r.message && r.message.status === 'success') {
 				window.location.reload();
 			}
+		},
+		error: function() {
+			alert('Failed to add operation. Please try again.');
 		}
 	});
 }

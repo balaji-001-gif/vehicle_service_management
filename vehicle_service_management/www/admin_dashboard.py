@@ -36,6 +36,7 @@ def get_context(context):
 		for r in context.requests:
 			r.customer_name = frappe.db.get_value("Customer", r.customer, "customer_name") or r.customer
 			r.mechanic_name = frappe.db.get_value("Vehicle Mechanic", r.mechanic, "mechanic_name") or ""
+			r.service_bays = frappe.db.get_all("Vehicle Service Bay", filters={"parent": r.name}, fields=["name", "bay_name", "bay_status"], order_by="idx asc")
 	elif view == "feedback":
 		context.feedback = frappe.get_all("Vehicle Service Feedback", fields=["name", "customer", "service_request", "rating", "comments", "creation"], order_by="creation desc", limit=100)
 		for f in context.feedback:
