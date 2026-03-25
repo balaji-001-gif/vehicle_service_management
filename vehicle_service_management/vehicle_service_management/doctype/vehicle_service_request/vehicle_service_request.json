@@ -13,11 +13,7 @@
   "column_break_general",
   "status",
   "section_vehicle",
-  "vehicle_name",
-  "vehicle_brand",
-  "column_break_vehicle",
-  "vehicle_model",
-  "vehicle_no",
+  "vehicle",
   "category",
   "section_problem",
   "problem_description",
@@ -69,32 +65,11 @@
    "label": "Vehicle Details"
   },
   {
-   "fieldname": "vehicle_name",
-   "fieldtype": "Data",
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Vehicle Name",
-   "reqd": 1
-  },
-  {
-   "fieldname": "vehicle_brand",
-   "fieldtype": "Data",
-   "label": "Vehicle Brand",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_vehicle",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "vehicle_model",
-   "fieldtype": "Data",
-   "label": "Vehicle Model",
-   "reqd": 1
-  },
-  {
-   "fieldname": "vehicle_no",
-   "fieldtype": "Data",
-   "label": "Vehicle Number",
+   "label": "Vehicle",
+   "options": "Vehicle Master",
    "reqd": 1
   },
   {

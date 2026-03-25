@@ -18,22 +18,20 @@ def get_service_status(search_term=None):
 	# Search by vehicle number
 	results = frappe.db.get_all(
 		"Vehicle Service Request",
-		filters={"vehicle_no": ["like", f"%{search_term}%"]},
+		filters={"vehicle": ["like", f"%{search_term}%"]},
 		fields=[
-			"name", "vehicle_name", "vehicle_brand", "vehicle_model",
-			"vehicle_no", "category", "problem_description",
+			"name", "vehicle", "category", "problem_description",
 			"status", "date", "cost", "customer", "mechanic", "payment_status", "quotation_approved"
 		],
 		order_by="modified desc",
 		limit=10
 	)
 
-	# If no results by vehicle number, try customer mobile
 	if not results:
 		# Find customers whose mobile matches
 		mechanics_or_customers = frappe.db.sql("""
-			SELECT vsr.name, vsr.vehicle_name, vsr.vehicle_brand, vsr.vehicle_model,
-				vsr.vehicle_no, vsr.category, vsr.problem_description,
+			SELECT vsr.name, vsr.vehicle,
+				vsr.category, vsr.problem_description,
 				vsr.status, vsr.date, vsr.cost, vsr.customer, vsr.mechanic, vsr.payment_status, vsr.quotation_approved
 			FROM `tabVehicle Service Request` vsr
 			LEFT JOIN `tabCustomer` c ON c.name = vsr.customer
@@ -62,6 +60,19 @@ def get_service_status(search_term=None):
 		r["service_bays"] = frappe.db.get_all("Vehicle Service Bay", filters={"parent": r.name}, fields=["name", "bay_name", "bay_status"], order_by="idx asc")
 		r["customer_name"] = frappe.db.get_value("Customer", r.get("customer"), "customer_name") or r.get("customer", "")
 		r["mechanic_name"] = frappe.db.get_value("Vehicle Mechanic", r.get("mechanic"), "mechanic_name") or ""
+		
+		# Inject Vehicle Master details for template compatibility
+		r["vehicle_brand"] = ""
+		r["vehicle_model"] = ""
+		r["vehicle_no"] = r.get("vehicle") or ""
+		r["vehicle_name"] = "-"
+		if r.get("vehicle"):
+			vehicle_doc = frappe.db.get_value("Vehicle Master", r.get("vehicle"), ["make", "model", "vehicle_number", "fuel_type"], as_dict=True)
+			if vehicle_doc:
+				r["vehicle_brand"] = vehicle_doc.make or ""
+				r["vehicle_model"] = vehicle_doc.model or ""
+				r["vehicle_no"] = vehicle_doc.vehicle_number or ""
+				r["vehicle_name"] = f"{vehicle_doc.make or ''} {vehicle_doc.model or ''}".strip() or "-"
 
 	return results
 
@@ -80,8 +91,7 @@ def get_admin_stats():
 	recent_enquiries = frappe.db.get_all(
 		"Vehicle Service Request",
 		fields=[
-			"name", "customer", "vehicle_name", "category",
-			"vehicle_model", "vehicle_brand", "problem_description",
+			"name", "customer", "vehicle", "category", "problem_description",
 			"status", "date", "mechanic", "payment_status", "quotation_approved"
 		],
 		order_by="creation desc",
@@ -91,6 +101,19 @@ def get_admin_stats():
 	for r in recent_enquiries:
 		r["customer_name"] = frappe.db.get_value("Customer", r.get("customer"), "customer_name") or r.get("customer", "")
 		r["mechanic_name"] = frappe.db.get_value("Vehicle Mechanic", r.get("mechanic"), "mechanic_name") or ""
+		
+		# Inject Vehicle Master details for template compatibility
+		r["vehicle_brand"] = ""
+		r["vehicle_model"] = ""
+		r["vehicle_no"] = r.get("vehicle") or ""
+		r["vehicle_name"] = "-"
+		if r.get("vehicle"):
+			vehicle_doc = frappe.db.get_value("Vehicle Master", r.get("vehicle"), ["make", "model", "vehicle_number", "fuel_type"], as_dict=True)
+			if vehicle_doc:
+				r["vehicle_brand"] = vehicle_doc.make or ""
+				r["vehicle_model"] = vehicle_doc.model or ""
+				r["vehicle_no"] = vehicle_doc.vehicle_number or ""
+				r["vehicle_name"] = f"{vehicle_doc.make or ''} {vehicle_doc.model or ''}".strip() or "-"
 
 	return {
 		"total_customers": total_customers,
@@ -118,8 +141,7 @@ def get_mechanic_requests():
 		"Vehicle Service Request",
 		filters={"mechanic": mechanic},
 		fields=[
-			"name", "customer", "vehicle_name", "vehicle_brand", "vehicle_model",
-			"vehicle_no", "category", "problem_description",
+			"name", "customer", "vehicle", "category", "problem_description",
 			"status", "date", "cost", "payment_status", "quotation_approved"
 		],
 		order_by="modified desc",
@@ -139,6 +161,19 @@ def get_mechanic_requests():
 				"pending": i > current_index,
 			})
 		r["service_bays"] = frappe.db.get_all("Vehicle Service Bay", filters={"parent": r.name}, fields=["name", "bay_name", "bay_status"], order_by="idx asc")
+		
+		# Inject Vehicle Master details for template compatibility
+		r["vehicle_brand"] = ""
+		r["vehicle_model"] = ""
+		r["vehicle_no"] = r.get("vehicle") or ""
+		r["vehicle_name"] = "-"
+		if r.get("vehicle"):
+			vehicle_doc = frappe.db.get_value("Vehicle Master", r.get("vehicle"), ["make", "model", "vehicle_number", "fuel_type"], as_dict=True)
+			if vehicle_doc:
+				r["vehicle_brand"] = vehicle_doc.make or ""
+				r["vehicle_model"] = vehicle_doc.model or ""
+				r["vehicle_no"] = vehicle_doc.vehicle_number or ""
+				r["vehicle_name"] = f"{vehicle_doc.make or ''} {vehicle_doc.model or ''}".strip() or "-"
 
 	return {"requests": requests, "mechanic_name": mechanic_name}
 
@@ -167,6 +202,11 @@ def update_request_status(request_name, new_status):
 		if new_status not in ["Repairing", "Repairing Done"]:
 			frappe.throw("Mechanics can only update status to 'Repairing' or 'Repairing Done'.")
 
+	if new_status == "Released" and doc.status != "Released":
+		# Generate standard ERPNext Sales Invoice
+		if doc.cost and doc.cost > 0:
+			create_sales_invoice(doc)
+
 	doc.status = new_status
 	doc.save(ignore_permissions=True)
 	frappe.db.commit()
@@ -185,19 +225,73 @@ def process_payment(request_name):
 	
 	doc.payment_status = "Paid"
 	doc.save(ignore_permissions=True)
+	
+	# If invoice exists, generate a Payment Entry
+	si_name = frappe.db.get_value("Sales Invoice", {"po_no": doc.name, "docstatus": 1}, "name")
+	if si_name:
+		create_payment_entry(si_name)
+
 	frappe.db.commit()
 
 	return {"status": "success"}
 
+def create_sales_invoice(doc):
+	"""Helper to generate a native ERPNext Sales Invoice linked to our Custom Service Request"""
+	existing_si = frappe.db.get_value("Sales Invoice", {"po_no": doc.name, "docstatus": 1}, "name")
+	if existing_si:
+		return existing_si
+		
+	# Ensure basic service item exists
+	if not frappe.db.exists("Item", "Vehicle Service"):
+		item = frappe.get_doc({
+			"doctype": "Item",
+			"item_code": "Vehicle Service",
+			"item_name": "Vehicle Service",
+			"item_group": "Services",
+			"is_stock_item": 0,
+			"stock_uom": "Nos"
+		})
+		item.insert(ignore_permissions=True)
+		
+	si = frappe.get_doc({
+		"doctype": "Sales Invoice",
+		"customer": doc.customer,
+		"po_no": doc.name, 
+		"items": [{
+			"item_code": "Vehicle Service",
+			"qty": 1,
+			"rate": doc.cost,
+			"description": f"Service for {doc.vehicle} - {doc.problem_description}"
+		}]
+	})
+	si.flags.ignore_permissions = True
+	si.insert()
+	si.submit()
+	return si.name
+
+def create_payment_entry(si_name):
+	"""Helper to record native ERPNext Payment Entry against Invoice"""
+	try:
+		from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
+		pe = get_payment_entry("Sales Invoice", si_name, bank_account=None)
+		pe.reference_no = si_name
+		pe.reference_date = frappe.utils.today()
+		pe.flags.ignore_permissions = True
+		pe.insert()
+		pe.submit()
+	except ImportError:
+		# If user doesn't have ERPNext installed, bypass
+		pass
+
 
 @frappe.whitelist(allow_guest=True)
 def book_service(customer_name, mobile, vehicle_name, vehicle_brand, vehicle_model,
-				 vehicle_no, category, problem_description):
+				 vehicle_no, category, problem_description, fuel_type="Petrol", insurance_expiry=None, puc_expiry=None):
 	"""
 	Allow customers to book a service request from the online portal.
-	Creates or finds a Customer record and creates a Vehicle Service Request.
+	Creates or finds a Customer record, creates a Vehicle Master, and issues the Request.
 	"""
-	if not all([customer_name, mobile, vehicle_name, vehicle_brand, vehicle_model,
+	if not all([customer_name, mobile, vehicle_brand, vehicle_model,
 				vehicle_no, problem_description]):
 		frappe.throw("All fields are required.")
 
@@ -215,14 +309,29 @@ def book_service(customer_name, mobile, vehicle_name, vehicle_brand, vehicle_mod
 		cust_doc.insert(ignore_permissions=True)
 		customer = cust_doc.name
 
+	# Find or create Vehicle Master
+	existing_vehicle = frappe.db.get_value("Vehicle Master", {"vehicle_number": vehicle_no}, "name")
+	if existing_vehicle:
+		vehicle_id = existing_vehicle
+	else:
+		veh_doc = frappe.get_doc({
+			"doctype": "Vehicle Master",
+			"vehicle_number": vehicle_no,
+			"make": vehicle_brand,
+			"model": vehicle_model,
+			"fuel_type": fuel_type,
+			"customer": customer,
+			"insurance_expiry": insurance_expiry,
+			"puc_expiry": puc_expiry
+		})
+		veh_doc.insert(ignore_permissions=True)
+		vehicle_id = veh_doc.name
+
 	# Create service request
 	req = frappe.get_doc({
 		"doctype": "Vehicle Service Request",
 		"customer": customer,
-		"vehicle_name": vehicle_name,
-		"vehicle_brand": vehicle_brand,
-		"vehicle_model": vehicle_model,
-		"vehicle_no": vehicle_no,
+		"vehicle": vehicle_id,
 		"category": category,
 		"problem_description": problem_description,
 		"status": "Pending"

@@ -203,8 +203,15 @@
 					<div class="form-section-title">Vehicle Details</div>
 					<div class="form-row">
 						<div class="form-group">
-							<label>Vehicle Name <span class="req">*</span></label>
-							<input type="text" id="vehicle_name" required placeholder="e.g. Activa">
+							<label>Fuel Type <span class="req">*</span></label>
+							<select id="fuel_type" required>
+								<option value="Petrol">Petrol</option>
+								<option value="Diesel">Diesel</option>
+								<option value="Electric (EV)">Electric (EV)</option>
+								<option value="CNG">CNG</option>
+								<option value="Hybrid">Hybrid</option>
+								<option value="Other">Other</option>
+							</select>
 						</div>
 						<div class="form-group">
 							<label>Vehicle Brand <span class="req">*</span></label>
@@ -278,7 +285,7 @@ function submitBooking(e) {
 		args: {
 			customer_name: document.getElementById('customer_name').value,
 			mobile: document.getElementById('mobile').value,
-			vehicle_name: document.getElementById('vehicle_name').value,
+			fuel_type: document.getElementById('fuel_type').value,
 			vehicle_brand: document.getElementById('vehicle_brand').value,
 			vehicle_model: document.getElementById('vehicle_model').value,
 			vehicle_no: vehicleNo,

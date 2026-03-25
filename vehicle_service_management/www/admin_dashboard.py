@@ -32,11 +32,23 @@ def get_context(context):
 	elif view == "mechanics":
 		context.mechanics = frappe.get_all("Vehicle Mechanic", fields=["name", "mechanic_name", "status"], order_by="modified desc")
 	elif view == "requests":
-		context.requests = frappe.get_all("Vehicle Service Request", fields=["name", "customer", "vehicle_name", "category", "status", "date", "mechanic", "cost", "payment_status"], order_by="modified desc", limit=100)
+		context.requests = frappe.get_all("Vehicle Service Request", fields=["name", "customer", "vehicle", "category", "status", "date", "mechanic", "cost", "payment_status"], order_by="modified desc", limit=100)
 		for r in context.requests:
 			r.customer_name = frappe.db.get_value("Customer", r.customer, "customer_name") or r.customer
 			r.mechanic_name = frappe.db.get_value("Vehicle Mechanic", r.mechanic, "mechanic_name") or ""
 			r.service_bays = frappe.db.get_all("Vehicle Service Bay", filters={"parent": r.name}, fields=["name", "bay_name", "bay_status"], order_by="idx asc")
+			
+			r.vehicle_brand = ""
+			r.vehicle_model = ""
+			r.vehicle_no = r.vehicle or ""
+			r.vehicle_name = "-"
+			if r.vehicle:
+				vehicle_doc = frappe.db.get_value("Vehicle Master", r.vehicle, ["make", "model", "vehicle_number"], as_dict=True)
+				if vehicle_doc:
+					r.vehicle_brand = vehicle_doc.make or ""
+					r.vehicle_model = vehicle_doc.model or ""
+					r.vehicle_no = vehicle_doc.vehicle_number or ""
+					r.vehicle_name = f"{vehicle_doc.make or ''} {vehicle_doc.model or ''}".strip() or "-"
 	elif view == "feedback":
 		context.feedback = frappe.get_all("Vehicle Service Feedback", fields=["name", "customer", "service_request", "rating", "comments", "creation"], order_by="creation desc", limit=100)
 		for f in context.feedback:
