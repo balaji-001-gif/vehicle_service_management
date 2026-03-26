@@ -161,6 +161,7 @@ def get_mechanic_requests():
 				"pending": i > current_index,
 			})
 		r["service_bays"] = frappe.db.get_all("Vehicle Service Bay", filters={"parent": r.name}, fields=["name", "bay_name", "bay_status"], order_by="idx asc")
+		r["consumed_spares"] = frappe.db.get_all("Consumed Spare", filters={"parent": r.name}, fields=["name", "item", "qty", "rate", "amount"], order_by="idx asc")
 		
 		# Inject Vehicle Master details for template compatibility
 		r["vehicle_brand"] = ""
@@ -203,9 +204,10 @@ def update_request_status(request_name, new_status):
 			frappe.throw("Mechanics can only update status to 'Repairing' or 'Repairing Done'.")
 
 	if new_status == "Released" and doc.status != "Released":
+		# Automatically issue consumed inventory
+		create_stock_entry(doc)
 		# Generate standard ERPNext Sales Invoice
-		if doc.cost and doc.cost > 0:
-			create_sales_invoice(doc)
+		create_sales_invoice(doc)
 
 	doc.status = new_status
 	doc.save(ignore_permissions=True)
@@ -235,6 +237,46 @@ def process_payment(request_name):
 
 	return {"status": "success"}
 
+def create_stock_entry(doc):
+	"""Generates a Material Issue Stock Entry to deduct consumed spares from warehouse"""
+	if not doc.consumed_spares:
+		return
+		
+	# Check if already issued
+	existing_se = frappe.db.exists("Stock Entry", {"purpose": "Material Issue", "remarks": f"Auto-issued for {doc.name}", "docstatus": 1})
+	if existing_se:
+		return
+		
+	company = frappe.defaults.get_user_default("Company") or frappe.get_all("Company", limit=1)[0].name
+	# Try to find a default warehouse
+	default_warehouse = frappe.db.get_value("Warehouse", {"company": company, "is_group": 0}, "name")
+	
+	if not default_warehouse:
+		return # Cannot construct stock entry without a warehouse
+		
+	try:
+		se = frappe.new_doc("Stock Entry")
+		se.purpose = "Material Issue"
+		se.set_posting_time = 1
+		se.company = company
+		se.remarks = f"Auto-issued for {doc.name}"
+		
+		cost_center = frappe.db.get_value("Company", company, "cost_center")
+		
+		for spare in doc.consumed_spares:
+			se.append("items", {
+				"item_code": spare.item,
+				"qty": spare.qty,
+				"s_warehouse": default_warehouse,
+				"cost_center": cost_center
+			})
+			
+		se.flags.ignore_permissions = True
+		se.insert()
+		se.submit()
+	except Exception as e:
+		frappe.log_error(f"Stock Entry creation failed for {doc.name}: {str(e)}")
+
 def create_sales_invoice(doc):
 	"""Helper to generate a native ERPNext Sales Invoice linked to our Custom Service Request"""
 	existing_si = frappe.db.get_value("Sales Invoice", {"po_no": doc.name, "docstatus": 1}, "name")
@@ -253,26 +295,41 @@ def create_sales_invoice(doc):
 		})
 		item.insert(ignore_permissions=True)
 		
-	# Handle Insurance Split Billing
-	customer_liability = doc.cost
+	customer_liability = doc.cost or 0
+	
+	# Determine if there are specific spares
+	invoice_items = []
+	if doc.consumed_spares:
+		for spare in doc.consumed_spares:
+			invoice_items.append({
+				"item_code": spare.item,
+				"qty": spare.qty,
+				"rate": spare.rate or 0
+			})
+	else:
+		if customer_liability > 0:
+			invoice_items.append({
+				"item_code": "Vehicle Service",
+				"qty": 1,
+				"rate": customer_liability,
+				"description": f"Service for {doc.vehicle} - {doc.problem_description}"
+			})
+			
+	if not invoice_items:
+		return None
+		
+	# Handle Insurance Split Billing overriding the primary items rate if no spares given
 	if doc.is_insurance_job and doc.insurance_claim:
 		claim = frappe.get_doc("Insurance Claim", doc.insurance_claim)
 		if claim.claim_type == "Cashless" and claim.deductible_amount is not None:
-			customer_liability = claim.deductible_amount
-
-	if customer_liability <= 0:
-		return None  # Nothing for customer to pay directly
+			if len(invoice_items) == 1 and invoice_items[0]["item_code"] == "Vehicle Service":
+				invoice_items[0]["rate"] = claim.deductible_amount
 
 	si = frappe.get_doc({
 		"doctype": "Sales Invoice",
 		"customer": doc.customer,
 		"po_no": doc.name, 
-		"items": [{
-			"item_code": "Vehicle Service",
-			"qty": 1,
-			"rate": customer_liability,
-			"description": f"Service for {doc.vehicle} - {doc.problem_description}"
-		}]
+		"items": invoice_items
 	})
 	si.flags.ignore_permissions = True
 	si.insert()
@@ -487,4 +544,54 @@ def save_paint_job_card(service_request, insurance_claim, status, paint_booth, d
 	doc.save(ignore_permissions=True)
 	frappe.db.commit()
 	
+	return {"status": "success"}
+
+@frappe.whitelist()
+def add_consumed_spare(request_name, item_code, qty):
+	""" Mechanics add a spare part directly to the active request """
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	is_admin = "System Manager" in frappe.get_roles(user)
+	
+	doc = frappe.get_doc("Vehicle Service Request", request_name)
+	if doc.mechanic != mechanic and not is_admin:
+		frappe.throw("You are not authorized to modify this request.")
+		
+	rate = frappe.db.get_value("Item", item_code, "standard_rate") or 0.0
+	from frappe.utils import flt
+	qty_flt = flt(qty)
+	
+	doc.append("consumed_spares", {
+		"item": item_code,
+		"qty": qty_flt,
+		"rate": rate,
+		"amount": qty_flt * rate
+	})
+	
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	return {"status": "success"}
+
+@frappe.whitelist()
+def remove_consumed_spare(request_name, spare_id):
+	""" Mechanics remove a wrongly added spare part """
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	is_admin = "System Manager" in frappe.get_roles(user)
+	
+	doc = frappe.get_doc("Vehicle Service Request", request_name)
+	if doc.mechanic != mechanic and not is_admin:
+		frappe.throw("You are not authorized to modify this request.")
+	
+	to_remove = None
+	for spare in doc.consumed_spares:
+		if spare.name == spare_id:
+			to_remove = spare
+			break
+			
+	if to_remove:
+		doc.remove(to_remove)
+		doc.save(ignore_permissions=True)
+		frappe.db.commit()
+		
 	return {"status": "success"}

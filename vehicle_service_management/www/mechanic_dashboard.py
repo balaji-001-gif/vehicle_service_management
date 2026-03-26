@@ -18,3 +18,5 @@ def get_context(context):
 
 	context.mechanic_name = data.get("mechanic_name", "")
 	context.requests = data.get("requests", [])
+	
+	context.stock_items = frappe.get_all("Item", filters={"is_stock_item": 1}, fields=["name", "item_code", "item_name", "standard_rate"], order_by="item_name asc")

@@ -364,6 +364,37 @@
 			</div>
 			{% endif %}
 
+			<!-- Consumed Spares -->
+			{% if r.status in ['Quoted', 'Approved', 'Repairing'] %}
+			<div class="bays-container" style="margin-top: 1rem; border-color: #fca5a5; background: #fef2f2;">
+				<div class="bay-title" style="color: #b91c1c;">
+					<span>📦 Spare Parts Consumed</span>
+				</div>
+				<div class="bay-list" id="spares-list-{{ r.name }}">
+					{% for spare in r.consumed_spares %}
+					<div class="bay-item" style="justify-content: space-between; padding: 0.5rem; border: 1px solid #fecaca; background: #fff;">
+						<span style="font-size: 0.8rem; font-weight: 600;">{{ spare.item }}</span>
+						<div style="display: flex; align-items: center; gap: 0.5rem;">
+							<span style="font-size: 0.75rem; color: #64748b;">Qty: {{ spare.qty }}</span>
+							<button onclick="removeSpare('{{ r.name }}', '{{ spare.name }}')" style="background: none; border: none; color: #ef4444; font-size: 0.9rem; cursor: pointer; padding: 0;">🗑️</button>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+				
+				<div id="add-spare-ui-{{ r.name }}" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+					<select id="new-spare-{{ r.name }}" style="flex: 2; padding: 0.4rem; border: 1px solid #fecaca; border-radius: 6px; font-size: 0.75rem; outline: none; background: white;">
+						{% for item in stock_items %}
+						<option value="{{ item.item_code }}">{{ item.item_name }} ({{ item.item_code }})</option>
+						{% endfor %}
+					</select>
+					<input type="number" id="new-spare-qty-{{ r.name }}" value="1" min="0.1" step="0.1" style="flex: 1; padding: 0.4rem; border: 1px solid #fecaca; border-radius: 6px; font-size: 0.75rem; outline: none;">
+					<button onclick="submitNewSpare('{{ r.name }}')" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.75rem; font-weight: 600; cursor: pointer;">Add</button>
+				</div>
+				<button id="btn-add-spare-{{ r.name }}" class="btn-add-bay" style="color: #ef4444; border-color: #ef4444;" onclick="showAddSpare('{{ r.name }}')">+ Add Spare Part</button>
+			</div>
+			{% endif %}
+
 			<!-- Action Buttons -->
 			<div class="req-actions">
 				{% set statuses = ["Repairing", "Repairing Done"] %}
@@ -442,6 +473,48 @@ function submitNewBay(reqName) {
 		},
 		error: function() {
 			alert('Failed to add operation. Please try again.');
+		}
+	});
+}
+
+function showAddSpare(reqName) {
+	document.getElementById('btn-add-spare-' + reqName).style.display = 'none';
+	document.getElementById('add-spare-ui-' + reqName).style.display = 'flex';
+}
+
+function submitNewSpare(reqName) {
+	let itemCode = document.getElementById('new-spare-' + reqName).value;
+	let qty = document.getElementById('new-spare-qty-' + reqName).value;
+	frappe.call({
+		method: 'vehicle_service_management.api.add_consumed_spare',
+		args: {
+			request_name: reqName,
+			item_code: itemCode,
+			qty: qty
+		},
+		callback: function(r) {
+			if (r.message && r.message.status === 'success') {
+				window.location.reload();
+			}
+		},
+		error: function() {
+			alert('Failed to add spare part. Check inventory.');
+		}
+	});
+}
+
+function removeSpare(reqName, spareId) {
+	if(!confirm('Remove this spare part?')) return;
+	frappe.call({
+		method: 'vehicle_service_management.api.remove_consumed_spare',
+		args: {
+			request_name: reqName,
+			spare_id: spareId
+		},
+		callback: function(r) {
+			if(r.message && r.message.status === 'success') {
+				window.location.reload();
+			}
 		}
 	});
 }

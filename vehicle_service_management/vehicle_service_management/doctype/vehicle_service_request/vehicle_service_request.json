@@ -19,12 +19,15 @@
   "problem_description",
   "section_service",
   "mechanic",
+  "service_package",
   "column_break_service",
   "cost",
   "payment_status",
   "quotation_approved",
   "is_insurance_job",
   "insurance_claim",
+  "section_break_spares",
+  "consumed_spares",
   "section_bays",
   "service_bays"
  ],
@@ -103,6 +106,12 @@
    "options": "Vehicle Mechanic"
   },
   {
+   "fieldname": "service_package",
+   "fieldtype": "Link",
+   "label": "Service Package",
+   "options": "Service Package"
+  },
+  {
    "fieldname": "column_break_service",
    "fieldtype": "Column Break"
   },
@@ -136,6 +145,17 @@
    "fieldtype": "Link",
    "label": "Insurance Claim",
    "options": "Insurance Claim"
+  },
+  {
+   "fieldname": "section_break_spares",
+   "fieldtype": "Section Break",
+   "label": "Spares & Inventory"
+  },
+  {
+   "fieldname": "consumed_spares",
+   "fieldtype": "Table",
+   "label": "Consumed Spares",
+   "options": "Consumed Spare"
   },
   {
    "fieldname": "section_bays",
