@@ -129,6 +129,7 @@ function savePaintJob(e) {
 			btn.textContent = '💾 Save Paint Job Data';
 			if (r.message && r.message.status === 'success') {
 				alert('Paint Job Card saved successfully!');
+				window.location.href = '/mechanic_dashboard';
 			}
 		},
 		error: function() {
