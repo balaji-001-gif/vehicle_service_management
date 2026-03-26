@@ -428,6 +428,13 @@
 								<span class="status-pill {{ r.status | lower | replace(' ', '-') }}">
 									{{ r.status }}
 								</span>
+								{% if r.insurance_claim_status %}
+								<div style="margin-top: 0.5rem;">
+									<span class="status-pill" style="background:#fef3c7; color:#92400e; font-size: 0.65rem; padding: 0.2rem 0.5rem; border:1px solid #fde68a; white-space: nowrap;">
+										🛡️ {{ r.insurance_claim_status }}
+									</span>
+								</div>
+								{% endif %}
 							</td>
 							<td class="action-cell">
 								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">

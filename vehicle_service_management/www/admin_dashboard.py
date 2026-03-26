@@ -32,7 +32,7 @@ def get_context(context):
 	elif view == "mechanics":
 		context.mechanics = frappe.get_all("Vehicle Mechanic", fields=["name", "mechanic_name", "status"], order_by="modified desc")
 	elif view == "requests":
-		context.requests = frappe.get_all("Vehicle Service Request", fields=["name", "customer", "vehicle", "category", "status", "date", "mechanic", "cost", "payment_status"], order_by="modified desc", limit=100)
+		context.requests = frappe.get_all("Vehicle Service Request", fields=["name", "customer", "vehicle", "category", "status", "date", "mechanic", "cost", "payment_status", "is_insurance_job", "insurance_claim"], order_by="modified desc", limit=100)
 		for r in context.requests:
 			r.customer_name = frappe.db.get_value("Customer", r.customer, "customer_name") or r.customer
 			r.mechanic_name = frappe.db.get_value("Vehicle Mechanic", r.mechanic, "mechanic_name") or ""
@@ -49,6 +49,11 @@ def get_context(context):
 					r.vehicle_model = vehicle_doc.model or ""
 					r.vehicle_no = vehicle_doc.vehicle_number or ""
 					r.vehicle_name = f"{vehicle_doc.make or ''} {vehicle_doc.model or ''}".strip() or "-"
+			
+			if r.is_insurance_job and r.insurance_claim:
+				r.insurance_claim_status = frappe.db.get_value("Insurance Claim", r.insurance_claim, "claim_status")
+			else:
+				r.insurance_claim_status = None
 	elif view == "feedback":
 		context.feedback = frappe.get_all("Vehicle Service Feedback", fields=["name", "customer", "service_request", "rating", "comments", "creation"], order_by="creation desc", limit=100)
 		for f in context.feedback:

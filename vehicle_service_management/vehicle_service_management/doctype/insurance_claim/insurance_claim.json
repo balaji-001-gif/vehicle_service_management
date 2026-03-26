@@ -1,0 +1,189 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:INS-{####}",
+ "creation": "2024-03-26 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_general",
+  "customer",
+  "vehicle",
+  "service_request",
+  "column_break_1",
+  "claim_type",
+  "claim_status",
+  "section_insurer",
+  "insurer",
+  "policy_number",
+  "policy_expiry",
+  "column_break_2",
+  "claim_number",
+  "date_of_loss",
+  "section_surveyor",
+  "surveyor_name",
+  "column_break_3",
+  "surveyor_contact",
+  "section_financials",
+  "deductible_amount",
+  "depreciation_applied",
+  "column_break_4",
+  "net_payable_by_insurer"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_general",
+   "fieldtype": "Section Break",
+   "label": "General Details"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vehicle",
+   "options": "Vehicle Master",
+   "reqd": 1
+  },
+  {
+   "fieldname": "service_request",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vehicle Service Request",
+   "options": "Vehicle Service Request",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "claim_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Claim Type",
+   "options": "Cashless\nReimbursement",
+   "reqd": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "claim_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Claim Status",
+   "options": "Draft\nIntimated\nSurveyor Assigned\nSurvey Done\nEstimate Approved\nParts Approved\nRepair In Progress\nSettled\nRejected\nPartial",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_insurer",
+   "fieldtype": "Section Break",
+   "label": "Insurer & Policy Details"
+  },
+  {
+   "fieldname": "insurer",
+   "fieldtype": "Data",
+   "label": "Insurer Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "policy_number",
+   "fieldtype": "Data",
+   "label": "Policy Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "policy_expiry",
+   "fieldtype": "Date",
+   "label": "Policy Expiry Date"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "claim_number",
+   "fieldtype": "Data",
+   "label": "Claim Number (Insurer-issued)"
+  },
+  {
+   "fieldname": "date_of_loss",
+   "fieldtype": "Date",
+   "label": "Date of Loss/Accident"
+  },
+  {
+   "fieldname": "section_surveyor",
+   "fieldtype": "Section Break",
+   "label": "Surveyor assigned"
+  },
+  {
+   "fieldname": "surveyor_name",
+   "fieldtype": "Data",
+   "label": "Surveyor Name"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "surveyor_contact",
+   "fieldtype": "Data",
+   "label": "Surveyor Contact"
+  },
+  {
+   "fieldname": "section_financials",
+   "fieldtype": "Section Break",
+   "label": "Claim Financials"
+  },
+  {
+   "fieldname": "deductible_amount",
+   "fieldtype": "Currency",
+   "label": "Deductible Amount (Customer's Liability)"
+  },
+  {
+   "fieldname": "depreciation_applied",
+   "fieldtype": "Currency",
+   "label": "Depreciation Applied"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "net_payable_by_insurer",
+   "fieldtype": "Currency",
+   "label": "Net Payable by Insurer"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-03-26 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Vehicle Service Management",
+ "name": "Insurance Claim",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

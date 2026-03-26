@@ -23,6 +23,8 @@
   "cost",
   "payment_status",
   "quotation_approved",
+  "is_insurance_job",
+  "insurance_claim",
   "section_bays",
   "service_bays"
  ],
@@ -121,6 +123,19 @@
    "fieldname": "quotation_approved",
    "fieldtype": "Check",
    "label": "Quotation Approved"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_insurance_job",
+   "fieldtype": "Check",
+   "label": "Is Insurance Job?"
+  },
+  {
+   "depends_on": "eval:doc.is_insurance_job==1",
+   "fieldname": "insurance_claim",
+   "fieldtype": "Link",
+   "label": "Insurance Claim",
+   "options": "Insurance Claim"
   },
   {
    "fieldname": "section_bays",

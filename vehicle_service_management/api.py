@@ -253,6 +253,16 @@ def create_sales_invoice(doc):
 		})
 		item.insert(ignore_permissions=True)
 		
+	# Handle Insurance Split Billing
+	customer_liability = doc.cost
+	if doc.is_insurance_job and doc.insurance_claim:
+		claim = frappe.get_doc("Insurance Claim", doc.insurance_claim)
+		if claim.claim_type == "Cashless" and claim.deductible_amount is not None:
+			customer_liability = claim.deductible_amount
+
+	if customer_liability <= 0:
+		return None  # Nothing for customer to pay directly
+
 	si = frappe.get_doc({
 		"doctype": "Sales Invoice",
 		"customer": doc.customer,
@@ -260,7 +270,7 @@ def create_sales_invoice(doc):
 		"items": [{
 			"item_code": "Vehicle Service",
 			"qty": 1,
-			"rate": doc.cost,
+			"rate": customer_liability,
 			"description": f"Service for {doc.vehicle} - {doc.problem_description}"
 		}]
 	})

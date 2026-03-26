@@ -16,6 +16,8 @@
   "column_break_3",
   "customer",
   "section_break_expiries",
+  "insurer",
+  "policy_number",
   "insurance_expiry",
   "column_break_5",
   "puc_expiry"
@@ -76,6 +78,16 @@
    "fieldname": "section_break_expiries",
    "fieldtype": "Section Break",
    "label": "Expiries & Compliance"
+  },
+  {
+   "fieldname": "insurer",
+   "fieldtype": "Data",
+   "label": "Insurer Company"
+  },
+  {
+   "fieldname": "policy_number",
+   "fieldtype": "Data",
+   "label": "Policy Number"
   },
   {
    "fieldname": "insurance_expiry",
