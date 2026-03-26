@@ -11,6 +11,10 @@
   "column_break_1",
   "make",
   "model",
+  "section_break_dashboard",
+  "current_mileage",
+  "oil_health_percent",
+  "tire_pressure_status",
   "section_break_specs",
   "fuel_type",
   "column_break_3",
@@ -51,6 +55,26 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Model"
+  },
+  {
+   "fieldname": "section_break_dashboard",
+   "fieldtype": "Section Break",
+   "label": "Dashboard Stats"
+  },
+  {
+   "fieldname": "current_mileage",
+   "fieldtype": "Int",
+   "label": "Current Mileage (mi)"
+  },
+  {
+   "fieldname": "oil_health_percent",
+   "fieldtype": "Int",
+   "label": "Oil Health (%)"
+  },
+  {
+   "fieldname": "tire_pressure_status",
+   "fieldtype": "Data",
+   "label": "Tire Pressure Status"
   },
   {
    "fieldname": "section_break_specs",
