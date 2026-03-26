@@ -595,3 +595,47 @@ def remove_consumed_spare(request_name, spare_id):
 		frappe.db.commit()
 		
 	return {"status": "success"}
+
+
+@frappe.whitelist()
+def save_vehicle_inspection(request_name, overall_condition, general_remarks, items):
+	"""
+	Save or update a Digital Vehicle Inspection report.
+	"""
+	import json
+	if isinstance(items, str):
+		items = json.loads(items)
+
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	is_admin = "System Manager" in frappe.get_roles(user)
+	
+	req_doc = frappe.get_doc("Vehicle Service Request", request_name)
+	if req_doc.mechanic != mechanic and not is_admin:
+		frappe.throw("You are not authorized to save this inspection.")
+
+	inspection_name = frappe.db.get_value("Vehicle Inspection", {"service_request": request_name}, "name")
+	
+	if inspection_name:
+		doc = frappe.get_doc("Vehicle Inspection", inspection_name)
+	else:
+		doc = frappe.new_doc("Vehicle Inspection")
+		doc.service_request = request_name
+		doc.vehicle = req_doc.vehicle
+		doc.inspector = mechanic
+
+	doc.overall_condition = overall_condition
+	doc.general_remarks = general_remarks
+	
+	doc.set("inspection_items", [])
+	for item in items:
+		doc.append("inspection_items", {
+			"item_description": item.get("item_description"),
+			"status": item.get("status"),
+			"photo": item.get("photo")
+		})
+
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	
+	return {"status": "success", "inspection": doc.name}

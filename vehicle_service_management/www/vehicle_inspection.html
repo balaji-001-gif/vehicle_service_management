@@ -1,0 +1,222 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Digital Vehicle Inspection{% endblock %}
+
+{% block head_include %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+	--bg: #f3f4f6;
+	--card: #ffffff;
+	--text: #111827;
+	--text-muted: #6b7280;
+	--border: #e5e7eb;
+	--primary: #0ea5e9;
+	--success: #10b981;
+	--warning: #f59e0b;
+	--danger: #ef4444;
+}
+body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); }
+.inspection-page { max-width: 600px; margin: 0 auto; padding: 2rem 1rem; }
+.card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1.5rem; }
+h1 { font-size: 1.25rem; font-weight: 700; margin: 0 0 0.5rem; }
+.req-id { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+
+.item-row { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+.item-row:last-child { border-bottom: none; }
+.item-header { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.75rem; display: block; }
+
+.status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
+.status-btn { 
+	padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; 
+	font-size: 0.75rem; font-weight: 600; text-align: center; cursor: pointer; background: white; transition: 0.2s;
+}
+.status-btn.active.ok { background: var(--success); color: white; border-color: var(--success); }
+.status-btn.active.warning { background: var(--warning); color: white; border-color: var(--warning); }
+.status-btn.active.urgent { background: var(--danger); color: white; border-color: var(--danger); }
+
+.photo-upload { display: flex; align-items: center; gap: 0.5rem; }
+.photo-input { display: none; }
+.photo-label { 
+	cursor: pointer; display: flex; align-items: center; gap: 0.3rem; 
+	font-size: 0.8rem; font-weight: 500; color: var(--primary); 
+}
+.preview-img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; display: none; }
+
+.btn-submit { width: 100%; padding: 0.85rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+.btn-submit:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+.summary-group { margin-bottom: 1rem; }
+.summary-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+.summary-group select, .summary-group textarea { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; }
+
+.back-link { display: inline-block; margin-bottom: 1rem; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="inspection-page">
+	<a href="/mechanic-dashboard" class="back-link">← Back</a>
+	<div class="card">
+		<h1>🔍 Digital Inspection</h1>
+		<div class="req-id">{{ request.name }} • {{ vehicle_name }}</div>
+	</div>
+
+	<form id="inspection-form" onsubmit="submitInspection(event)">
+		<div class="card">
+			{% if inspection %}
+				{% for item in inspection.inspection_items %}
+				<div class="item-row" data-item="{{ item.item_description }}">
+					<span class="item-header">{{ item.item_description }}</span>
+					<div class="status-grid">
+						<div class="status-btn ok {% if item.status == 'OK' %}active{% endif %}" onclick="setStatus(this, 'OK')">OK</div>
+						<div class="status-btn warning {% if item.status == 'Attention Required' %}active{% endif %}" onclick="setStatus(this, 'Attention Required')">ATTN</div>
+						<div class="status-btn urgent {% if item.status == 'Urgent' %}active{% endif %}" onclick="setStatus(this, 'Urgent')">URGENT</div>
+					</div>
+					<div class="photo-upload">
+						<label class="photo-label">
+							<input type="file" class="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+							<span>📷 Add Photo</span>
+						</label>
+						{% if item.photo %}
+						<img src="{{ item.photo }}" class="preview-img" style="display:block;">
+						{% else %}
+						<img src="" class="preview-img">
+						{% endif %}
+					</div>
+				</div>
+				{% endfor %}
+			{% else %}
+				{% for desc in standard_items %}
+				<div class="item-row" data-item="{{ desc }}">
+					<span class="item-header">{{ desc }}</span>
+					<div class="status-grid">
+						<div class="status-btn ok" onclick="setStatus(this, 'OK')">OK</div>
+						<div class="status-btn warning" onclick="setStatus(this, 'Attention Required')">ATTN</div>
+						<div class="status-btn urgent" onclick="setStatus(this, 'Urgent')">URGENT</div>
+					</div>
+					<div class="photo-upload">
+						<label class="photo-label">
+							<input type="file" class="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+							<span>📷 Add Photo</span>
+						</label>
+						<img src="" class="preview-img">
+					</div>
+				</div>
+				{% endfor %}
+			{% endif %}
+		</div>
+
+		<div class="card">
+			<div class="summary-group">
+				<label>Overall Condition</label>
+				<select id="overall_condition">
+					{% for opt in ["Excellent", "Good", "Fair", "Poor", "Critical"] %}
+					<option value="{{ opt }}" {% if inspection and inspection.overall_condition == opt %}selected{% endif %}>{{ opt }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="summary-group">
+				<label>General Remarks</label>
+				<textarea id="general_remarks" rows="3">{% if inspection %}{{ inspection.general_remarks }}{% endif %}</textarea>
+			</div>
+		</div>
+
+		<button type="submit" class="btn-submit" id="submit-btn">💾 Save Inspection Task</button>
+	</form>
+</div>
+
+<script>
+function setStatus(btn, val) {
+	const grid = btn.parentElement;
+	grid.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+	btn.classList.add('active');
+}
+
+function handlePhoto(input) {
+	const file = input.files[0];
+	if (!file) return;
+	
+	const reader = new FileReader();
+	reader.onload = function(e) {
+		const preview = input.closest('.photo-upload').querySelector('.preview-img');
+		preview.src = e.target.result;
+		preview.style.display = 'block';
+	};
+	reader.readAsDataURL(file);
+}
+
+async function submitInspection(e) {
+	e.preventDefault();
+	const btn = document.getElementById('submit-btn');
+	btn.disabled = true;
+	btn.textContent = 'Uploading...';
+
+	const items = [];
+	const rows = document.querySelectorAll('.item-row');
+	
+	for (let row of rows) {
+		const description = row.getAttribute('data-item');
+		const activeBtn = row.querySelector('.status-btn.active');
+		const status = activeBtn ? activeBtn.textContent === 'OK' ? 'OK' : activeBtn.textContent === 'ATTN' ? 'Attention Required' : 'Urgent' : 'OK';
+		
+		const fileInput = row.querySelector('.photo-input');
+		let photoUrl = null;
+		
+		if (fileInput.files.length > 0) {
+			// Upload file first
+			const file = fileInput.files[0];
+			const formData = new FormData();
+			formData.append('file', file);
+			formData.append('is_private', 0);
+			formData.append('folder', 'Home/Attachments');
+			
+			try {
+				const uploadRes = await fetch('/api/method/upload_file', {
+					method: 'POST',
+					headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
+					body: formData
+				});
+				const uploadData = await uploadRes.json();
+				if (uploadData.message && uploadData.message.file_url) {
+					photoUrl = uploadData.message.file_url;
+				}
+			} catch (err) {
+				console.error('Photo upload failed for ' + description, err);
+			}
+		} else {
+			// Keep existing if any
+			const existingImg = row.querySelector('.preview-img');
+			if (existingImg.src && existingImg.src.startsWith('http')) {
+				photoUrl = new URL(existingImg.src).pathname;
+			}
+		}
+
+		items.append({
+			item_description: description,
+			status: status,
+			photo: photoUrl
+		});
+	}
+
+	frappe.call({
+		method: 'vehicle_service_management.api.save_vehicle_inspection',
+		args: {
+			request_name: '{{ request.name }}',
+			overall_condition: document.getElementById('overall_condition').value,
+			general_remarks: document.getElementById('general_remarks').value,
+			items: items
+		},
+		callback: function(r) {
+			btn.disabled = false;
+			btn.textContent = '💾 Save Inspection Task';
+			if (r.message && r.message.status === 'success') {
+				alert('Inspection Report Saved Successfully!');
+				window.location.href = '/mechanic-dashboard';
+			}
+		}
+	});
+}
+</script>
+{% endblock %}

@@ -443,6 +443,13 @@
 									</span>
 								</div>
 								{% endif %}
+								{% if r.inspection_report %}
+								<div style="margin-top: 0.5rem;">
+									<span class="status-pill" style="background:#ecfdf5; color:#065f46; font-size: 0.65rem; padding: 0.2rem 0.5rem; border:1px solid #a7f3d0; white-space: nowrap;">
+										🔍 DVI: {{ r.inspection_condition }}
+									</span>
+								</div>
+								{% endif %}
 							</td>
 							<td class="action-cell">
 								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">

@@ -59,6 +59,11 @@ def get_context(context):
 			pjc = frappe.db.get_value("Paint Job Card", {"service_request": r.name}, ["name", "status"], as_dict=True)
 			r.paint_job_card = pjc.name if pjc else None
 			r.paint_job_status = pjc.status if pjc else None
+			
+			# Check for Digital Inspection
+			inspection = frappe.db.get_value("Vehicle Inspection", {"service_request": r.name}, ["name", "overall_condition"], as_dict=True)
+			r.inspection_report = inspection.name if inspection else None
+			r.inspection_condition = inspection.overall_condition if inspection else None
 	elif view == "feedback":
 		context.feedback = frappe.get_all("Vehicle Service Feedback", fields=["name", "customer", "service_request", "rating", "comments", "creation"], order_by="creation desc", limit=100)
 		for f in context.feedback:
