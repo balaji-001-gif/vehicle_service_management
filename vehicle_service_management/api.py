@@ -352,7 +352,7 @@ def create_payment_entry(si_name):
 
 
 @frappe.whitelist(allow_guest=True)
-def book_service(customer_name, mobile, vehicle_name, vehicle_brand, vehicle_model,
+def book_service(customer_name, mobile, vehicle_brand, vehicle_model,
 				 vehicle_no, category, problem_description, fuel_type="Petrol", insurance_expiry=None, puc_expiry=None):
 	"""
 	Allow customers to book a service request from the online portal.
