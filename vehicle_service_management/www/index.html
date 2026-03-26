@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Precision - Vehicle Service Management</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700& family=Manrope:wght@700;800& display=swap" rel="stylesheet"/>
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1& display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+          tailwind.config = {
+            darkMode: "class",
+            theme: {
+              extend: {
+                colors: {
+                  "tertiary-fixed-dim": "#ffb692",
+                  "on-primary": "#ffffff",
+                  "primary-fixed-dim": "#b0c6ff",
+                  "surface-bright": "#f8f9fb",
+                  "on-secondary-fixed-variant": "#354a53",
+                  "surface-variant": "#e0e3e5",
+                  "on-tertiary-fixed": "#341100",
+                  "surface-container-lowest": "#ffffff",
+                  "secondary": "#4c616c",
+                  "inverse-on-surface": "#eff1f3",
+                  "outline": "#767683",
+                  "on-secondary-fixed": "#071e27",
+                  "on-tertiary-container": "#fb6b00",
+                  "on-secondary-container": "#526772",
+                  "on-tertiary": "#ffffff",
+                  "error": "#ba1a1a",
+                  "on-error": "#ffffff",
+                  "outline-variant": "#c6c5d4",
+                  "on-primary-fixed-variant": "#00429c",
+                  "on-tertiary-fixed-variant": "#7a3000",
+                  "on-surface-variant": "#454652",
+                  "error-container": "#ffdad6",
+                  "surface-container": "#eceef0",
+                  "surface-tint": "#2b5bb5",
+                  "surface-dim": "#d8dadc",
+                  "secondary-fixed": "#cfe6f2",
+                  "primary-fixed": "#d9e2ff",
+                  "on-primary-fixed": "#001945",
+                  "on-background": "#191c1e",
+                  "surface-container-low": "#f2f4f6",
+                  "background": "#f8f9fb",
+                  "tertiary-fixed": "#ffdbcb",
+                  "primary": "#001944",
+                  "on-primary-container": "#6b95f3",
+                  "primary-container": "#002c6e",
+                  "surface": "#f8f9fb",
+                  "inverse-surface": "#2d3133",
+                  "tertiary": "#331000",
+                  "tertiary-container": "#551f00",
+                  "on-error-container": "#93000a",
+                  "surface-container-highest": "#e0e3e5",
+                  "secondary-fixed-dim": "#b4cad6",
+                  "on-surface": "#191c1e",
+                  "secondary-container": "#cfe6f2",
+                  "inverse-primary": "#b0c6ff",
+                  "on-secondary": "#ffffff",
+                  "surface-container-high": "#e6e8ea"
+                },
+                fontFamily: {
+                  "headline": ["Manrope"],
+                  "body": ["Inter"],
+                  "label": ["Inter"]
+                },
+                borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+              },
+            },
+          }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-fill { font-variation-settings: 'FILL' 1; }
+        .glass-header { background: rgba(248, 249, 251, 0.8); backdrop-filter: blur(12px); }
+        .primary-gradient { background: linear-gradient(135deg, #001944 0%, #002c6e 100%); }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 glass-header bg-surface/80 dark:bg-slate-900/80 backdrop-blur-xl">
+        <div class="flex items-center justify-between px-6 py-4 w-full">
+            <div class="flex items-center gap-4">
+                <button class="text-primary dark:text-blue-400 hover:opacity-80 transition-opacity active:scale-95 duration-200">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <h1 class="text-primary dark:text-blue-500 font-manrope font-black tracking-tighter italic text-xl uppercase">PRECISION</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="text-secondary dark:text-slate-400 hover:opacity-80 transition-opacity active:scale-95 duration-200">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://ui-avatars.com/api/?name={{ customer_name }}&background=001944&color=fff"/>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 pb-32 px-6 max-w-5xl mx-auto">
+        <!-- Hero Section -->
+        <section class="mb-10">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                <div class="max-w-xl">
+                    <span class="inline-block text-tertiary font-bold tracking-widest text-[10px] uppercase mb-2">System Status: Optimal</span>
+                    <h2 class="text-4xl md:text-5xl font-black text-on-surface tracking-tight leading-none mb-4">
+                        Good morning,<br/><span class="text-primary-container">{{ customer_name.split(' ')[0] }}</span>
+                    </h2>
+                    <p class="text-secondary body-md max-w-sm">
+                        {% if vehicle %}
+                            Your {{ vehicle.make }} {{ vehicle.model }} is performing at peak efficiency.
+                        {% else %}
+                            Welcome to Precision. Ready to book your first service?
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="w-full md:w-auto">
+                    <a class="primary-gradient text-on-primary px-8 py-4 rounded-full font-bold uppercase tracking-wider text-sm shadow-xl flex items-center gap-3 hover:opacity-90 active:translate-y-1 transition-all" href="/book_service">
+                        <span class="material-symbols-outlined text-xl">calendar_add_on</span>
+                        Book Service
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <!-- Primary Service Card -->
+            <div class="md:col-span-8 bg-surface-container-lowest rounded-3xl p-8 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-700"></div>
+                <div class="relative z-10">
+                    {% if active_request %}
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-2 h-10 bg-on-tertiary-container rounded-full"></div>
+                        <div>
+                            <p class="text-[10px] font-bold text-secondary uppercase tracking-widest">Active Status</p>
+                            <h3 class="text-2xl font-bold text-primary">{{ active_request.status }} — {{ active_request.problem_description[:30] }}...</h3>
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                        <div class="w-full md:w-1/2">
+                            <div class="relative aspect-video rounded-2xl overflow-hidden bg-surface-container shadow-inner">
+                                <img class="w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1485291571150-772bcfc10da5?auto=format&fit=crop&q=80&w=800"/>
+                                <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg">
+                                    <span class="text-xs font-bold text-primary">{{ active_request.vehicle }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2 space-y-6">
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold uppercase tracking-wider text-secondary">
+                                    <span>Completion</span>
+                                    <span>{{ active_request.progress }}%</span>
+                                </div>
+                                <div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+                                    <div class="h-full bg-on-tertiary-container" style="width: {{ active_request.progress }}%;"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 bg-surface-container-low rounded-2xl">
+                                    <p class="text-[10px] font-bold text-secondary uppercase">Technician</p>
+                                    <p class="font-bold text-primary">{{ active_request.mechanic_name or "Assigning..." }}</p>
+                                </div>
+                                <div class="p-4 bg-surface-container-low rounded-2xl">
+                                    <p class="text-[10px] font-bold text-secondary uppercase">Last Update</p>
+                                    <p class="font-bold text-primary">{{ active_request.creation.split(' ')[0] }}</p>
+                                </div>
+                            </div>
+                            <a href="/service_tracking?q={{ active_request.vehicle }}" class="inline-block text-xs font-bold text-primary-container uppercase tracking-widest hover:underline">Track Live →</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <span class="material-symbols-outlined text-6xl text-surface-container-high mb-4">check_circle</span>
+                        <h3 class="text-xl font-bold text-primary">No Active Services</h3>
+                        <p class="text-secondary text-sm">Everything is running smoothly. Your vehicle is ready for the road.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Maintenance Reminder Card -->
+            <div class="md:col-span-4 bg-tertiary-container rounded-3xl p-8 text-on-tertiary flex flex-col justify-between">
+                <div>
+                    <span class="material-symbols-outlined text-4xl mb-4 text-tertiary-fixed-dim">event_upcoming</span>
+                    <h3 class="text-xl font-bold leading-tight mb-2">Checkup Recommended</h3>
+                    <p class="text-tertiary-fixed-dim text-sm">Keep your vehicle in top shape with regular inspections.</p>
+                </div>
+                <div class="mt-8">
+                    <a href="/book_service" class="block w-full py-3 bg-tertiary-fixed text-tertiary text-center font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-white transition-colors">
+                        Book Checkup
+                    </a>
+                </div>
+            </div>
+
+            <!-- Vehicle Detail Stats -->
+            <div class="md:col-span-4 bg-surface-container-low rounded-3xl p-6">
+                <h4 class="text-sm font-bold uppercase tracking-widest text-secondary mb-6 px-2">Vehicle Stats</h4>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-secondary">speed</span>
+                            <span class="text-sm font-medium text-secondary">Mileage</span>
+                        </div>
+                        <span class="font-bold text-primary">{{ vehicle.current_mileage if vehicle else "0" }} mi</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-secondary">tire_repair</span>
+                            <span class="text-sm font-medium text-secondary">Tire PSI</span>
+                        </div>
+                        <span class="font-bold text-primary">{{ vehicle.tire_pressure_status if (vehicle and vehicle.tire_pressure_status) else "32/34 F/R" }}</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-secondary">oil_barrel</span>
+                            <span class="text-sm font-medium text-secondary">Oil Life</span>
+                        </div>
+                        <span class="font-bold {% if vehicle and vehicle.oil_health_percent < 20 %}text-error{% else %}text-on-tertiary-container{% endif %}">
+                            {{ vehicle.oil_health_percent if vehicle else "100" }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service History -->
+            <div class="md:col-span-8 bg-surface-container-low rounded-3xl p-6">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <h4 class="text-sm font-bold uppercase tracking-widest text-secondary">Service History</h4>
+                    <a href="/service_tracking" class="text-on-primary-fixed-variant text-xs font-bold uppercase tracking-widest hover:underline">View All</a>
+                </div>
+                <div class="space-y-2">
+                    {% for h in history %}
+                    <div class="flex items-center justify-between p-4 bg-surface rounded-2xl group hover:bg-white transition-colors cursor-pointer" onclick="window.location.href='/service_tracking?q={{ h.vehicle }}'">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-xl">build</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-primary text-sm">{{ h.problem_description[:40] }}...</p>
+                                <p class="text-xs text-secondary">{{ h.date }} • Precision Workshop</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-primary text-sm">₹{{ h.cost or "0.00" }}</p>
+                            <span class="text-[10px] text-on-secondary-container font-bold uppercase bg-secondary-container px-2 py-0.5 rounded">Completed</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-secondary py-10">No service history yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-3xl bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.06)] h-20 px-4 pb-safe flex justify-around items-center">
+        <a class="flex flex-col items-center justify-center text-primary scale-110 transition-transform duration-300" href="/">
+            <span class="material-symbols-outlined material-fill">dashboard</span>
+            <span class="font-inter text-[10px] font-semibold uppercase tracking-wider mt-1">Dashboard</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-400 hover:text-primary transition-transform duration-300" href="/service_tracking">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="font-inter text-[10px] font-semibold uppercase tracking-wider mt-1">History</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-400 hover:text-primary transition-transform duration-300" href="/book_service">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span class="font-inter text-[10px] font-semibold uppercase tracking-wider mt-1">Book</span>
+        </a>
+    </nav>
+</body>
+</html>
