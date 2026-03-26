@@ -1,0 +1,142 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Paint Job Card{% endblock %}
+
+{% block head_include %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+	--bg: #f8fafc;
+	--card: #ffffff;
+	--text: #1e293b;
+	--text-muted: #64748b;
+	--border: #e2e8f0;
+	--primary: #4f46e5;
+	--primary-hover: #4338ca;
+}
+.paint-page { font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; padding: 2rem 1rem; }
+.card-container { max-width: 600px; margin: 0 auto; background: var(--card); padding: 2rem; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 1.5rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 1rem;}
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase; }
+.form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+.btn-save { width: 100%; padding: 0.85rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 1rem;}
+.btn-save:hover { background: var(--primary-hover); }
+.btn-back { display: inline-block; margin-bottom: 1rem; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.checkbox-wrap { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-weight: 600; font-size:0.9rem;}
+.checkbox-wrap input { width: 18px; height: 18px; }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="paint-page">
+	<div class="card-container">
+		<a href="/mechanic-dashboard" class="btn-back">← Back to Dashboard</a>
+		<h1>🎨 Paint Job Card: {{ vehicle_name }}</h1>
+		
+		{% if error %}
+			<div style="color: red; font-weight: bold;">{{ error }}</div>
+		{% else %}
+			<form id="paint-form" onsubmit="savePaintJob(event)">
+				<input type="hidden" id="service_request" value="{{ request_name }}">
+				<input type="hidden" id="insurance_claim" value="{{ insurance_claim }}">
+				
+				<div class="form-group grid-2">
+					<div>
+						<label>Status</label>
+						<select id="status">
+							{% set statuses = ["Draft", "Sanding", "Masking", "Priming", "Basecoat", "Clearcoat", "Drying", "Completed"] %}
+							{% for st in statuses %}
+								<option value="{{ st }}" {% if card and card.status == st %}selected{% endif %}>{{ st }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div>
+						<label>Paint Booth Allocation</label>
+						<select id="paint_booth">
+							<option value="">-- No Booth Assigned --</option>
+							{% for booth in booths %}
+								<option value="{{ booth.name }}" {% if card and card.paint_booth == booth.name %}selected{% endif %}>{{ booth.equipment_name }} ({{ booth.status }})</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				
+				<div class="checkbox-wrap">
+					<input type="checkbox" id="denting_required" {% if card and card.denting_required %}checked{% endif %}>
+					<label style="margin:0;text-transform:none;color:var(--text);">Denting/Tinkering Required</label>
+				</div>
+				
+				<div class="form-group grid-2">
+					<div>
+						<label>Color Code / Hex</label>
+						<input type="text" id="paint_code" placeholder="e.g. #FF5733 or Pearl White" value="{{ card.paint_code if card else '' }}">
+					</div>
+					<div>
+						<label>Paint Brand</label>
+						<input type="text" id="paint_brand" placeholder="e.g. Nippon" value="{{ card.paint_brand if card else '' }}">
+					</div>
+				</div>
+				
+				<div class="form-group grid-2">
+					<div>
+						<label>Volume Consumed (Liters)</label>
+						<input type="number" step="0.1" id="paint_volume" placeholder="0.0" value="{{ card.paint_volume_consumed if card else '' }}">
+					</div>
+					<div>
+						<label>Drying Time Est. (Hrs)</label>
+						<input type="number" step="0.5" id="drying_time" placeholder="0.0" value="{{ card.drying_time_hrs if card else '' }}">
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label>Primer Type</label>
+					<input type="text" id="primer_type" placeholder="e.g. Epoxy" value="{{ card.primer_type if card else '' }}">
+				</div>
+				
+				<button type="submit" class="btn-save" id="btn-save">💾 Save Paint Job Data</button>
+			</form>
+		{% endif %}
+	</div>
+</div>
+
+<script>
+function savePaintJob(e) {
+	e.preventDefault();
+	let btn = document.getElementById('btn-save');
+	btn.textContent = 'Saving...';
+	btn.disabled = true;
+	
+	frappe.call({
+		method: 'vehicle_service_management.api.save_paint_job_card',
+		args: {
+			service_request: document.getElementById('service_request').value,
+			insurance_claim: document.getElementById('insurance_claim').value,
+			status: document.getElementById('status').value,
+			paint_booth: document.getElementById('paint_booth').value,
+			denting_required: document.getElementById('denting_required').checked ? 1 : 0,
+			paint_code: document.getElementById('paint_code').value,
+			paint_brand: document.getElementById('paint_brand').value,
+			paint_volume: document.getElementById('paint_volume').value,
+			drying_time: document.getElementById('drying_time').value,
+			primer_type: document.getElementById('primer_type').value
+		},
+		callback: function(r) {
+			btn.disabled = false;
+			btn.textContent = '💾 Save Paint Job Data';
+			if (r.message && r.message.status === 'success') {
+				alert('Paint Job Card saved successfully!');
+			}
+		},
+		error: function() {
+			btn.disabled = false;
+			btn.textContent = '💾 Save Paint Job Data';
+			alert('Error saving data.');
+		}
+	});
+}
+</script>
+{% endblock %}

@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "bay_name",
-  "bay_status"
+  "bay_status",
+  "equipment_allocated"
  ],
  "fields": [
   {
@@ -26,6 +27,13 @@
    "label": "Status",
    "options": "Pending\nIn Progress\nCompleted",
    "reqd": 1
+  },
+  {
+   "fieldname": "equipment_allocated",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Allocated Equipment",
+   "options": "Workshop Equipment"
   }
  ],
  "index_web_pages_for_search": 1,

@@ -331,13 +331,20 @@
 				</div>
 				<div class="bay-list">
 					{% for bay in r.service_bays %}
-					<div class="bay-item">
-						<span class="bay-name">{{ bay.bay_name }}</span>
-						<select class="bay-status-select {% if bay.bay_status == 'Completed' %}completed{% elif bay.bay_status == 'In Progress' %}in-progress{% endif %}" onchange="updateBayStatus('{{ r.name }}', '{{ bay.name }}', this.value)">
-							<option value="Pending" {% if bay.bay_status == 'Pending' %}selected{% endif %}>Pending</option>
-							<option value="In Progress" {% if bay.bay_status == 'In Progress' %}selected{% endif %}>In Progress</option>
-							<option value="Completed" {% if bay.bay_status == 'Completed' %}selected{% endif %}>Completed</option>
-						</select>
+					<div class="bay-item" style="flex-direction: column; align-items: stretch; gap: 0.5rem;">
+						<div style="display: flex; justify-content: space-between; align-items: center;">
+							<span class="bay-name">{{ bay.bay_name }}</span>
+							<select class="bay-status-select {% if bay.bay_status == 'Completed' %}completed{% elif bay.bay_status == 'In Progress' %}in-progress{% endif %}" onchange="updateBayStatus('{{ r.name }}', '{{ bay.name }}', this.value)">
+								<option value="Pending" {% if bay.bay_status == 'Pending' %}selected{% endif %}>Pending</option>
+								<option value="In Progress" {% if bay.bay_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+								<option value="Completed" {% if bay.bay_status == 'Completed' %}selected{% endif %}>Completed</option>
+							</select>
+						</div>
+						{% if bay.bay_name == 'Painting' and bay.bay_status != 'Pending' %}
+						<div style="text-align: right; margin-top: 0.2rem;">
+							<a href="/paint-job-card?request={{ r.name }}" style="font-size: 0.75rem; font-weight: 600; color: #fff; background: #6366f1; padding: 0.4rem 0.8rem; border-radius: 6px; text-decoration: none; display: inline-block;">🎨 Edit Paint Job Card</a>
+						</div>
+						{% endif %}
 					</div>
 					{% endfor %}
 				</div>

@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:PJC-{####}",
+ "creation": "2024-03-26 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "service_request",
+  "insurance_claim",
+  "vehicle",
+  "column_break_1",
+  "status",
+  "denting_required",
+  "paint_booth",
+  "section_break_materials",
+  "paint_code",
+  "paint_brand",
+  "primer_type",
+  "column_break_2",
+  "paint_volume_consumed",
+  "drying_time_hrs",
+  "section_break_time",
+  "start_time",
+  "column_break_3",
+  "end_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_request",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Request",
+   "options": "Vehicle Service Request",
+   "reqd": 1
+  },
+  {
+   "fieldname": "insurance_claim",
+   "fieldtype": "Link",
+   "label": "Insurance Claim",
+   "options": "Insurance Claim"
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vehicle",
+   "options": "Vehicle Master",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Draft\nSanding\nMasking\nPriming\nBasecoat\nClearcoat\nDrying\nCompleted",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "denting_required",
+   "fieldtype": "Check",
+   "label": "Denting Required"
+  },
+  {
+   "fieldname": "paint_booth",
+   "fieldtype": "Link",
+   "label": "Paint Booth Assigned",
+   "options": "Workshop Equipment"
+  },
+  {
+   "fieldname": "section_break_materials",
+   "fieldtype": "Section Break",
+   "label": "Materials & Specs"
+  },
+  {
+   "fieldname": "paint_code",
+   "fieldtype": "Data",
+   "label": "Color Code / Hex"
+  },
+  {
+   "fieldname": "paint_brand",
+   "fieldtype": "Data",
+   "label": "Paint Brand"
+  },
+  {
+   "fieldname": "primer_type",
+   "fieldtype": "Data",
+   "label": "Primer Type"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "paint_volume_consumed",
+   "fieldtype": "Float",
+   "label": "Volume Consumed (Liters)"
+  },
+  {
+   "fieldname": "drying_time_hrs",
+   "fieldtype": "Float",
+   "label": "Drying Time (Hrs)"
+  },
+  {
+   "fieldname": "section_break_time",
+   "fieldtype": "Section Break",
+   "label": "Time Tracking"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-03-26 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Vehicle Service Management",
+ "name": "Paint Job Card",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

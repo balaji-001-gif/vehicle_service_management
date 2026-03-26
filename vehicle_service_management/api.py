@@ -447,3 +447,44 @@ def add_service_bay(request_name, bay_name):
 	doc.save(ignore_permissions=True)
 	frappe.db.commit()
 	return {"status": "success"}
+
+@frappe.whitelist()
+def save_paint_job_card(service_request, insurance_claim, status, paint_booth, denting_required, paint_code, paint_brand, paint_volume, drying_time, primer_type):
+	"""
+	Creates or updates a Paint Job Card from the mechanic portal.
+	"""
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	is_admin = "System Manager" in frappe.get_roles(user)
+	
+	req_doc = frappe.get_doc("Vehicle Service Request", service_request)
+	if req_doc.mechanic != mechanic and not is_admin:
+		frappe.throw("You do not have permission to modify this Paint Job Card.")
+		
+	existing_card = frappe.db.get_value("Paint Job Card", {"service_request": service_request}, "name")
+	
+	from frappe.utils import flt
+	
+	if existing_card:
+		doc = frappe.get_doc("Paint Job Card", existing_card)
+	else:
+		doc = frappe.new_doc("Paint Job Card")
+		doc.service_request = service_request
+		doc.vehicle = req_doc.vehicle
+		if insurance_claim:
+			doc.insurance_claim = insurance_claim
+		
+	doc.status = status
+	if paint_booth:
+		doc.paint_booth = paint_booth
+	doc.denting_required = int(denting_required)
+	doc.paint_code = paint_code
+	doc.paint_brand = paint_brand
+	doc.paint_volume_consumed = flt(paint_volume)
+	doc.drying_time_hrs = flt(drying_time)
+	doc.primer_type = primer_type
+	
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	
+	return {"status": "success"}

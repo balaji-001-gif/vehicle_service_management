@@ -225,6 +225,7 @@
 				<li><a href="/admin-dashboard?view=customers" class="{% if view == 'customers' %}active{% endif %}"><span class="icon">👥</span> Customer</a></li>
 				<li><a href="/admin-dashboard?view=mechanics" class="{% if view == 'mechanics' %}active{% endif %}"><span class="icon">🔩</span> Mechanic</a></li>
 				<li><a href="/admin-dashboard?view=requests" class="{% if view == 'requests' %}active{% endif %}"><span class="icon">📋</span> Request</a></li>
+				<li><a href="/admin-dashboard?view=equipment" class="{% if view == 'equipment' %}active{% endif %}"><span class="icon">🏗️</span> Equipment</a></li>
 				<li><a href="/admin-dashboard?view=feedback" class="{% if view == 'feedback' %}active{% endif %}"><span class="icon">💬</span> Feedback</a></li>
 			</ul>
 		</aside>
@@ -435,6 +436,13 @@
 									</span>
 								</div>
 								{% endif %}
+								{% if r.paint_job_status %}
+								<div style="margin-top: 0.5rem;">
+									<span class="status-pill" style="background:#e0e7ff; color:#3730a3; font-size: 0.65rem; padding: 0.2rem 0.5rem; border:1px solid #c7d2fe; white-space: nowrap;">
+										🎨 Paint: {{ r.paint_job_status }}
+									</span>
+								</div>
+								{% endif %}
 							</td>
 							<td class="action-cell">
 								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">
@@ -490,6 +498,46 @@
 				</div>
 				{% else %}
 				<div class="no-data">No feedback found.</div>
+				{% endif %}
+			</div>
+			
+			{% elif view == 'equipment' %}
+			<h1>Workshop Equipment</h1>
+			<div class="table-card">
+				<div class="table-title">Equipment Roster</div>
+				{% if equipment %}
+				<div style="overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Name / Asset</th>
+							<th>Type</th>
+							<th>Status</th>
+							<th>Last Maintenance</th>
+							<th>Next Maintenance</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for e in equipment %}
+						<tr>
+							<td><strong>{{ e.name }}</strong></td>
+							<td>{{ e.equipment_name }}</td>
+							<td>{{ e.type }}</td>
+							<td>
+								<span class="status-pill {% if e.status == 'Available' %}released{% elif e.status == 'In Use' %}pending{% else %}rejected{% endif %}">
+									{{ e.status }}
+								</span>
+							</td>
+							<td>{{ e.last_maintenance_date or '-' }}</td>
+							<td>{{ e.next_maintenance_date or '-' }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				</div>
+				{% else %}
+				<div class="no-data">No workshop equipment found. Add them via Desk!</div>
 				{% endif %}
 			</div>
 

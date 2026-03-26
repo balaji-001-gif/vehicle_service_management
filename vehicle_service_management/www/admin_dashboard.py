@@ -54,7 +54,14 @@ def get_context(context):
 				r.insurance_claim_status = frappe.db.get_value("Insurance Claim", r.insurance_claim, "claim_status")
 			else:
 				r.insurance_claim_status = None
+				
+			# Check for Paint Job Card
+			pjc = frappe.db.get_value("Paint Job Card", {"service_request": r.name}, ["name", "status"], as_dict=True)
+			r.paint_job_card = pjc.name if pjc else None
+			r.paint_job_status = pjc.status if pjc else None
 	elif view == "feedback":
 		context.feedback = frappe.get_all("Vehicle Service Feedback", fields=["name", "customer", "service_request", "rating", "comments", "creation"], order_by="creation desc", limit=100)
 		for f in context.feedback:
 			f.customer_name = frappe.db.get_value("Customer", f.customer, "customer_name") or f.customer
+	elif view == "equipment":
+		context.equipment = frappe.get_all("Workshop Equipment", fields=["name", "equipment_name", "type", "status", "last_maintenance_date", "next_maintenance_date"], order_by="equipment_name asc")
