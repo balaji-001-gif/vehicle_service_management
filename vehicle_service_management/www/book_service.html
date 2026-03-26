@@ -298,12 +298,27 @@ function submitBooking(e) {
 				document.getElementById('success-msg').style.display = 'block';
 				document.getElementById('created-req-id').textContent = r.message.request_id;
 				document.getElementById('track-btn').href = '/service-tracking?q=' + encodeURIComponent(vehicleNo);
+				
+				// Auto-redirect after 3 seconds
+				setTimeout(function() {
+					window.location.href = '/service-tracking?q=' + encodeURIComponent(vehicleNo);
+				}, 3000);
+			} else if (r._server_messages) {
+				var msgs = JSON.parse(r._server_messages);
+				var error = msgs.map(m => JSON.parse(m).message).join('\n');
+				alert('Server Error: ' + error);
+				btn.disabled = false;
+				btn.textContent = '📋 Submit Service Request';
 			}
 		},
-		error: function() {
+		error: function(r) {
 			btn.disabled = false;
 			btn.textContent = '📋 Submit Service Request';
-			alert('Something went wrong. Please try again.');
+			if (r.message) {
+				alert('Error: ' + r.message);
+			} else {
+				alert('Something went wrong. Please check your internet or server logs.');
+			}
 		}
 	});
 
