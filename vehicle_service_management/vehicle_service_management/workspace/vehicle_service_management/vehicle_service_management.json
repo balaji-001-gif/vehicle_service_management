@@ -14,21 +14,74 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Vehicle Mechanic",
+   "label": "Vehicle Service Request",
    "link_count": 0,
-   "link_to": "Vehicle Mechanic",
+   "link_to": "Vehicle Service Request",
    "link_type": "DocType",
-   "onboard": 0,
+   "on_board": 1,
    "type": "Link"
   },
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Vehicle Service Request",
+   "label": "Vehicle Master",
    "link_count": 0,
-   "link_to": "Vehicle Service Request",
+   "link_to": "Vehicle Master",
    "link_type": "DocType",
-   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vehicle Mechanic",
+   "link_count": 0,
+   "link_to": "Vehicle Mechanic",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Insurance Claim",
+   "link_count": 0,
+   "link_to": "Insurance Claim",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Package",
+   "link_count": 0,
+   "link_to": "Service Package",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Paint Job Card",
+   "link_count": 0,
+   "link_to": "Paint Job Card",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vehicle Inspection",
+   "link_count": 0,
+   "link_to": "Vehicle Inspection",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Workshop Equipment",
+   "link_count": 0,
+   "link_to": "Workshop Equipment",
+   "link_type": "DocType",
    "type": "Link"
   },
   {
@@ -38,11 +91,10 @@
    "link_count": 0,
    "link_to": "Vehicle Service Feedback",
    "link_type": "DocType",
-   "onboard": 0,
    "type": "Link"
   }
  ],
- "modified": "2024-03-20 00:00:00.000000",
+ "modified": "2024-03-26 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Vehicle Service Management",
  "name": "Vehicle Service Management",
@@ -54,24 +106,45 @@
  "sequence_id": 1,
  "shortcuts": [
   {
-   "color": "Blue",
+   "color": "Green",
    "doc_view": "List",
-   "label": "Vehicle Mechanic",
-   "link_to": "Vehicle Mechanic",
+   "label": "Service Requests",
+   "link_to": "Vehicle Service Request",
    "type": "DocType"
   },
   {
-   "color": "Green",
+   "color": "Blue",
    "doc_view": "List",
-   "label": "Vehicle Service Request",
-   "link_to": "Vehicle Service Request",
+   "label": "Vehicle Master",
+   "link_to": "Vehicle Master",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "label": "Insurance Claims",
+   "link_to": "Insurance Claim",
    "type": "DocType"
   },
   {
    "color": "Orange",
    "doc_view": "List",
-   "label": "Vehicle Service Feedback",
-   "link_to": "Vehicle Service Feedback",
+   "label": "Digital Inspections",
+   "link_to": "Vehicle Inspection",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "doc_view": "List",
+   "label": "Paint Job Cards",
+   "link_to": "Paint Job Card",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "label": "Inventory Packages",
+   "link_to": "Service Package",
    "type": "DocType"
   }
  ],
