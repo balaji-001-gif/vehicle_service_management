@@ -258,7 +258,7 @@
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
                         <div class="text-center md:text-left">
                             <p class="text-white/60 text-xs uppercase font-bold tracking-[0.2em] mb-1">Current Balance</p>
-                            <h4 class="text-4xl font-headline font-extrabold tracking-tighter">₹{{ r.cost or "0.00" }}</h4>
+                            <h4 class="text-4xl font-headline font-extrabold tracking-tighter text-white">₹{{ r.cost or "0.00" }}</h4>
                             <p class="text-white/40 text-[10px] mt-1">{{ r.payment_status }}</p>
                         </div>
                         {% if r.cost and r.payment_status != 'Paid' and r.status in ['Repairing Done', 'Released'] %}
