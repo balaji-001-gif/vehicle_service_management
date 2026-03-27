@@ -216,15 +216,15 @@
                 <div class="lg:col-span-4 bg-slate-900 text-white p-8 rounded-[2.5rem] shadow-xl">
                     <h4 class="font-headline font-bold mb-6 text-white">Quick Actions</h4>
                     <div class="space-y-4">
-                        <a href="/desk#List/Customer" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                        <a href="/app/customer" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
                             <p class="text-xs font-bold uppercase text-white/40 mb-1">CRM</p>
                             <p class="font-bold">Manage Customers</p>
                         </a>
-                        <a href="/desk#List/Vehicle Service Request" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                        <a href="/app/vehicle-service-request" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
                             <p class="text-xs font-bold uppercase text-white/40 mb-1">Operations</p>
                             <p class="font-bold">Active Service Requests</p>
                         </a>
-                        <a href="/desk#List/Insurance Claim" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                        <a href="/app/insurance-claim" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
                             <p class="text-xs font-bold uppercase text-white/40 mb-1">Finances</p>
                             <p class="font-bold">Insurance Settlements</p>
                         </a>
@@ -264,7 +264,7 @@
                                     </span>
                                 </td>
                                 <td class="py-4 px-4 text-right">
-                                    <a href="/desk#Form/Vehicle Service Request/{{ r.name }}" class="text-primary hover:underline font-bold text-xs uppercase">Open Desk</a>
+                                    <a href="/app/vehicle-service-request/{{ r.name }}" class="text-primary hover:underline font-bold text-xs uppercase">Open Desk</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -287,7 +287,7 @@
                             <span class="text-[10px] font-bold uppercase text-slate-400 tracking-widest">{{ m.status }}</span>
                         </div>
                     </div>
-                    <a href="/desk#Form/Vehicle Mechanic/{{ m.name }}" class="block text-center py-2 bg-slate-50 rounded-xl text-xs font-bold text-primary hover:bg-primary hover:text-white transition-all">Profile Details</a>
+                    <a href="/app/vehicle-mechanic/{{ m.name }}" class="block text-center py-2 bg-slate-50 rounded-xl text-xs font-bold text-primary hover:bg-primary hover:text-white transition-all">Profile Details</a>
                 </div>
                 {% endfor %}
             </div>
@@ -375,7 +375,7 @@
                                     <span class="text-[10px] font-bold uppercase px-2 py-1 rounded bg-slate-100">{{ c.customer_type }}</span>
                                 </td>
                                 <td class="py-5 px-4 text-right">
-                                    <a href="/desk#Form/Customer/{{ c.name }}" class="text-primary hover:underline font-bold text-xs uppercase tracking-widest">Open Profile</a>
+                                    <a href="/app/customer/{{ c.name }}" class="text-primary hover:underline font-bold text-xs uppercase tracking-widest">Open Profile</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -448,7 +448,7 @@
                                             <span class="material-symbols-outlined text-sm">near_me</span>
                                         </a>
                                         {% endif %}
-                                        <a href="/desk#Form/Vehicle Service Trip/{{ t.name }}" class="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors">
+                                        <a href="/app/vehicle-service-trip/{{ t.name }}" class="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors">
                                             <span class="material-symbols-outlined text-sm">edit</span>
                                         </a>
                                     </div>
