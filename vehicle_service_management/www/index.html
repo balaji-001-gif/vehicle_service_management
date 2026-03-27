@@ -171,7 +171,7 @@
                                 </div>
                                 <div class="p-4 bg-surface-container-low rounded-2xl">
                                     <p class="text-[10px] font-bold text-secondary uppercase">Last Update</p>
-                                    <p class="font-bold text-primary">{{ active_request.creation.split(' ')[0] }}</p>
+                                    <p class="font-bold text-primary">{{ active_request.creation.strftime('%Y-%m-%d') }}</p>
                                 </div>
                             </div>
                             <a href="/service_tracking?q={{ active_request.vehicle }}" class="inline-block text-xs font-bold text-primary-container uppercase tracking-widest hover:underline">Track Live →</a>
