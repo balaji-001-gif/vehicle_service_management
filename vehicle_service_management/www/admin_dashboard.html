@@ -386,7 +386,61 @@
             {% endif %}
 
             {% if view == 'insurance' %}
-                <!-- ... existing insurance content ... -->
+            <section class="bg-white rounded-[2rem] p-8 shadow-sm">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-headline text-2xl font-black text-primary">Insurance Claims Pipeline</h3>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider">{{ claims | length }} Active Claims</span>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto no-scrollbar">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                                <th class="pb-4 px-4">Claim ID</th>
+                                <th class="pb-4 px-4">Customer & Vehicle</th>
+                                <th class="pb-4 px-4">Type & Insurer</th>
+                                <th class="pb-4 px-4">Status</th>
+                                <th class="pb-4 px-4 text-right">Liability</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for c in claims %}
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="py-5 px-4 text-xs font-bold text-slate-500">{{ c.name }}</td>
+                                <td class="py-5 px-4">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-sm text-primary">{{ c.customer_name }}</span>
+                                        <span class="text-[10px] text-secondary font-medium uppercase">{{ c.vehicle_display }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-5 px-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-primary">{{ c.claim_type }}</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">{{ c.insurer }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-5 px-4">
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tight 
+                                        {% if c.claim_status in ['Draft', 'Intimated'] %}bg-blue-50 text-blue-600
+                                        {% elif c.claim_status in ['Estimate Approved', 'Parts Approved'] %}bg-orange-50 text-orange-600
+                                        {% elif c.claim_status == 'Settled' %}bg-green-50 text-green-600
+                                        {% elif c.claim_status == 'Rejected' %}bg-red-50 text-red-600
+                                        {% else %}bg-slate-50 text-slate-600{% endif %}">
+                                        {{ c.claim_status }}
+                                    </span>
+                                </td>
+                                <td class="py-5 px-4 text-right">
+                                    <p class="font-bold text-primary text-sm">₹{{ "{:,.2f}".format(c.net_payable_by_insurer) }}</p>
+                                    <a href="/app/insurance-claim/{{ c.name }}" class="text-[10px] text-primary hover:underline font-bold uppercase tracking-widest">Details →</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
             {% endif %}
 
             {% if view == 'trips' %}
