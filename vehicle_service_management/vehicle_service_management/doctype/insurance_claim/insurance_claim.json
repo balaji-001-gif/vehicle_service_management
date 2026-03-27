@@ -13,6 +13,7 @@
   "column_break_1",
   "claim_type",
   "claim_status",
+  "claim_intimation_date",
   "section_insurer",
   "insurer",
   "policy_number",
@@ -28,7 +29,9 @@
   "deductible_amount",
   "depreciation_applied",
   "column_break_4",
-  "net_payable_by_insurer"
+  "net_payable_by_insurer",
+  "settlement_date",
+  "rejection_reason"
  ],
  "fields": [
   {
@@ -159,6 +162,21 @@
    "fieldname": "net_payable_by_insurer",
    "fieldtype": "Currency",
    "label": "Net Payable by Insurer"
+  },
+  {
+   "fieldname": "claim_intimation_date",
+   "fieldtype": "Date",
+   "label": "Claim Intimation Date"
+  },
+  {
+   "fieldname": "settlement_date",
+   "fieldtype": "Date",
+   "label": "Settlement Date"
+  },
+  {
+   "fieldname": "rejection_reason",
+   "fieldtype": "Small Text",
+   "label": "Rejection Reason"
   }
  ],
  "index_web_pages_for_search": 1,
