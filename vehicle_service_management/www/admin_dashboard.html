@@ -328,6 +328,50 @@
                 {% endfor %}
             </div>
             {% endif %}
+
+            {% if view == 'customers' %}
+            <section class="bg-white rounded-[2rem] p-8 shadow-sm">
+                <h3 class="font-headline text-2xl font-black text-primary mb-8">Customer Portfolio</h3>
+                <div class="overflow-x-auto no-scrollbar">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                                <th class="pb-4 px-4">Customer Name</th>
+                                <th class="pb-4 px-4">Contact Detail</th>
+                                <th class="pb-4 px-4">Type</th>
+                                <th class="pb-4 px-4 text-right">Desk Link</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for c in customers %}
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="py-5 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-xs">
+                                            {{ c.customer_name[0] }}
+                                        </div>
+                                        <span class="font-bold text-primary">{{ c.customer_name }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-5 px-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-medium text-secondary">{{ c.mobile_no or 'N/A' }}</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">{{ c.email_id or '-' }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-5 px-4">
+                                    <span class="text-[10px] font-bold uppercase px-2 py-1 rounded bg-slate-100">{{ c.customer_type }}</span>
+                                </td>
+                                <td class="py-5 px-4 text-right">
+                                    <a href="/desk#Form/Customer/{{ c.name }}" class="text-primary hover:underline font-bold text-xs uppercase tracking-widest">Open Profile</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% endif %}
         </div>
     </main>
 </div>
