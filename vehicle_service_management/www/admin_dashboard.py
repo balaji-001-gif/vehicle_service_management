@@ -73,7 +73,17 @@ def get_context(context):
 		context.equipment = frappe.get_all("Workshop Equipment", fields=["name", "equipment_name", "type", "status", "last_maintenance_date", "next_maintenance_date"], order_by="equipment_name asc")
 	elif view == "insurance":
 		# 1. Insurance Claims Pipeline (by status)
-		claims = frappe.get_all("Insurance Claim", fields=["name", "claim_status", "claim_type", "insurer", "net_payable_by_insurer", "creation", "claim_intimation_date", "settlement_date", "rejection_reason", "customer", "vehicle"], order_by="creation desc")
+		fields = ["name", "claim_status", "claim_type", "insurer", "net_payable_by_insurer", "creation", "customer", "vehicle"]
+		
+		# Safer check for newly added columns
+		if frappe.db.has_column("Insurance Claim", "claim_intimation_date"):
+			fields.append("claim_intimation_date")
+		if frappe.db.has_column("Insurance Claim", "settlement_date"):
+			fields.append("settlement_date")
+		if frappe.db.has_column("Insurance Claim", "rejection_reason"):
+			fields.append("rejection_reason")
+
+		claims = frappe.get_all("Insurance Claim", fields=fields, order_by="creation desc")
 		
 		for c in claims:
 			c.customer_name = frappe.db.get_value("Customer", c.customer, "customer_name") or c.customer
@@ -90,10 +100,10 @@ def get_context(context):
 		context.claims_pipeline = pipeline
 		
 		# 2. Average claim settlement time
-		settled_claims = [c for c in claims if c.claim_status == "Settled" and c.settlement_date and (c.claim_intimation_date or c.creation)]
+		settled_claims = [c for c in claims if c.claim_status == "Settled" and c.get("settlement_date") and (c.get("claim_intimation_date") or c.creation)]
 		total_days = 0
 		for c in settled_claims:
-			intimation = c.claim_intimation_date or c.creation
+			intimation = c.get("claim_intimation_date") or c.creation
 			total_days += date_diff(c.settlement_date, intimation)
 		
 		context.avg_settlement_time = round(total_days / len(settled_claims), 1) if settled_claims else 0
@@ -110,10 +120,10 @@ def get_context(context):
 			insurer_stats[ins]["total_value"] += flt(c.net_payable_by_insurer)
 			
 			if c.claim_status != "Settled":
-				age = date_diff(nowdate(), (c.claim_intimation_date or c.creation))
+				age = date_diff(nowdate(), (c.get("claim_intimation_date") or c.creation))
 				insurer_stats[ins]["avg_age"] = (insurer_stats[ins]["avg_age"] * (insurer_stats[ins]["count"]-1) + age) / insurer_stats[ins]["count"]
 
-			if c.claim_status == "Rejected" and c.rejection_reason:
+			if c.claim_status == "Rejected" and c.get("rejection_reason"):
 				rejections.append({"insurer": ins, "reason": c.rejection_reason, "claim": c.name})
 		
 		context.insurer_stats = insurer_stats
