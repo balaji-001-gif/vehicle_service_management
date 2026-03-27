@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe.utils import flt
 
 
 @frappe.whitelist(allow_guest=True)
@@ -87,6 +88,7 @@ def get_admin_stats():
 	total_mechanics = frappe.db.count("Vehicle Mechanic")
 	total_enquiries = frappe.db.count("Vehicle Service Request")
 	total_feedback = frappe.db.count("Vehicle Service Feedback")
+	total_trips = frappe.db.count("Vehicle Service Trip", {"status": ["not in", ["Completed", "Cancelled"]]})
 
 	recent_enquiries = frappe.db.get_all(
 		"Vehicle Service Request",
@@ -120,6 +122,7 @@ def get_admin_stats():
 		"total_mechanics": total_mechanics,
 		"total_enquiries": total_enquiries,
 		"total_feedback": total_feedback,
+		"total_trips": total_trips,
 		"recent_enquiries": recent_enquiries
 	}
 
@@ -172,6 +175,7 @@ def get_mechanic_requests():
 			vehicle_doc = frappe.db.get_value("Vehicle Master", r.get("vehicle"), ["make", "model", "vehicle_number", "fuel_type"], as_dict=True)
 			if vehicle_doc:
 				r["vehicle_brand"] = vehicle_doc.make or ""
+				r["fuel_type"] = vehicle_doc.fuel_type or ""
 				r["vehicle_model"] = vehicle_doc.model or ""
 				r["vehicle_no"] = vehicle_doc.vehicle_number or ""
 				r["vehicle_name"] = f"{vehicle_doc.make or ''} {vehicle_doc.model or ''}".strip() or "-"
@@ -228,6 +232,9 @@ def process_payment(request_name):
 	doc.payment_status = "Paid"
 	doc.save(ignore_permissions=True)
 	
+	# Award Loyalty Points
+	award_loyalty_points(doc)
+	
 	# If invoice exists, generate a Payment Entry
 	si_name = frappe.db.get_value("Sales Invoice", {"po_no": doc.name, "docstatus": 1}, "name")
 	if si_name:
@@ -236,6 +243,23 @@ def process_payment(request_name):
 	frappe.db.commit()
 
 	return {"status": "success"}
+
+def award_loyalty_points(doc):
+	""" Awards 5% of service cost as loyalty points """
+	if not doc.customer or not doc.cost or flt(doc.cost) <= 0:
+		return
+	
+	points = int(flt(doc.cost) * 0.05)
+	if points <= 0:
+		return
+		
+	entry = frappe.new_doc("Loyalty Point Entry")
+	entry.customer = doc.customer
+	entry.service_request = doc.name
+	entry.points = points
+	entry.type = "Earned"
+	entry.description = f"Points earned for service {doc.name}"
+	entry.insert(ignore_permissions=True)
 
 def create_stock_entry(doc):
 	"""Generates a Material Issue Stock Entry to deduct consumed spares from warehouse"""
@@ -353,7 +377,9 @@ def create_payment_entry(si_name):
 
 @frappe.whitelist(allow_guest=True)
 def book_service(customer_name, mobile, vehicle_brand, vehicle_model,
-				 vehicle_no, category, problem_description, fuel_type="Petrol", insurance_expiry=None, puc_expiry=None):
+				 vehicle_no, category, problem_description, fuel_type="Petrol", 
+				 request_pickup=0, pickup_address=None,
+				 insurance_expiry=None, puc_expiry=None):
 	"""
 	Allow customers to book a service request from the online portal.
 	Creates or finds a Customer record, creates a Vehicle Master, and issues the Request.
@@ -401,6 +427,8 @@ def book_service(customer_name, mobile, vehicle_brand, vehicle_model,
 		"vehicle": vehicle_id,
 		"category": category,
 		"problem_description": problem_description,
+		"request_pickup": int(request_pickup),
+		"pickup_address": pickup_address,
 		"status": "Pending"
 	})
 	req.insert(ignore_permissions=True)
@@ -639,3 +667,70 @@ def save_vehicle_inspection(request_name, overall_condition, general_remarks, it
 	frappe.db.commit()
 	
 	return {"status": "success", "inspection": doc.name}
+
+
+@frappe.whitelist()
+def save_ev_battery_health(request_name, battery_pct, soh, voltage, temp, cycles, remarks):
+	""" Saves EV Battery Health metrics """
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	
+	req_doc = frappe.get_doc("Vehicle Service Request", request_name)
+	
+	from frappe.utils import flt
+	
+	existing = frappe.db.get_value("EV Battery Health", {"service_request": request_name}, "name")
+	if existing:
+		doc = frappe.get_doc("EV Battery Health", existing)
+	else:
+		doc = frappe.new_doc("EV Battery Health")
+		doc.service_request = request_name
+		doc.vehicle = req_doc.vehicle
+		
+	doc.battery_percentage = flt(battery_pct)
+	doc.state_of_health = flt(soh)
+	doc.voltage_v = flt(voltage)
+	doc.temperature_c = flt(temp)
+	doc.cycle_count = int(cycles)
+	doc.remarks_ev = remarks
+	
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	return {"status": "success"}
+
+
+@frappe.whitelist()
+def save_delivery_checklist(request_name, items, is_cleared, final_remarks):
+	""" Saves Quality Checklist before handover """
+	import json
+	if isinstance(items, str):
+		items = json.loads(items)
+		
+	user = frappe.session.user
+	mechanic = frappe.db.get_value("Vehicle Mechanic", {"user": user}, "name")
+	
+	req_doc = frappe.get_doc("Vehicle Service Request", request_name)
+	
+	existing = frappe.db.get_value("Vehicle Delivery Checklist", {"service_request": request_name}, "name")
+	if existing:
+		doc = frappe.get_doc("Vehicle Delivery Checklist", existing)
+	else:
+		doc = frappe.new_doc("Vehicle Delivery Checklist")
+		doc.service_request = request_name
+		doc.vehicle = req_doc.vehicle
+		doc.inspected_by = mechanic
+		
+	doc.is_cleared_for_delivery = int(is_cleared)
+	doc.final_remarks = final_remarks
+	
+	doc.set("checklist_items", [])
+	for item in items:
+		doc.append("checklist_items", {
+			"check_point": item.get("check_point"),
+			"status": item.get("status"),
+			"notes": item.get("notes")
+		})
+		
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	return {"status": "success"}

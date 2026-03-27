@@ -319,8 +319,12 @@
 					<div class="lbl">Problem</div>
 					<div class="val">{{ r.problem_description[:50] }}{% if r.problem_description|length > 50 %}...{% endif %}</div>
 				</div>
-				<div style="margin-top: 1rem;">
-					<a href="/vehicle_inspection?request={{ r.name }}" style="display: block; text-align: center; padding: 0.75rem; background: #0ea5e9; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">🔍 Digital Inspection Report</a>
+				<div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+					<a href="/vehicle_inspection?request={{ r.name }}" style="flex: 1; text-align: center; padding: 0.75rem; background: #0ea5e9; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.8rem;">🔍 Inspection</a>
+					{% if r.fuel_type == 'Electric (EV)' %}
+					<a href="/ev_battery_health?request={{ r.name }}" style="flex: 1; text-align: center; padding: 0.75rem; background: #10b981; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.8rem;">⚡ EV Health</a>
+					{% endif %}
+					<a href="/delivery_checklist?request={{ r.name }}" style="flex: 1; text-align: center; padding: 0.75rem; background: #8b5cf6; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.8rem;">✅ Quality</a>
 				</div>
 			</div>
 

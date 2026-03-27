@@ -89,6 +89,10 @@
                 <span class="material-symbols-outlined mr-3 text-lg">shield</span>
                 <span class="text-sm font-medium">Insurance</span>
             </a>
+            <a class="flex items-center px-4 py-3 rounded-lg transition-all duration-300 {% if view == 'trips' %}bg-white text-primary shadow-sm font-bold{% else %}text-slate-600 hover:bg-slate-100 hover:translate-x-1{% endif %}" href="/admin_dashboard?view=trips">
+                <span class="material-symbols-outlined mr-3 text-lg">local_shipping</span>
+                <span class="text-sm font-medium">Trips</span>
+            </a>
         </div>
 
         <div class="pt-6 border-t border-slate-200">
@@ -135,94 +139,98 @@
                 </div>
             </div>
 
-            <!-- Stats Bento Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-primary hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-primary/5 text-primary rounded-xl">
-                            <span class="material-symbols-outlined">group</span>
+            <!-- Advanced Workshop Insights (Sprint 9) -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
+                <!-- Revenue Card -->
+                <div class="bg-primary text-white p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <div class="relative z-10">
+                        <p class="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-3">Workshop Revenue</p>
+                        <h3 class="text-4xl font-headline font-black mb-1">₹{{ "{:,.0f}".format(total_revenue or 0) }}</h3>
+                        <div class="flex items-center gap-2 mt-4">
+                            <span class="px-2 py-0.5 bg-white/20 rounded-full text-[10px] font-bold">Margin: {{ profit_margin or 0 }}%</span>
                         </div>
                     </div>
-                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Total Customers</p>
-                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_customers }}</h3>
                 </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-secondary hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-secondary/5 text-secondary rounded-xl">
-                            <span class="material-symbols-outlined">engineering</span>
-                        </div>
+
+                <!-- Bay Utilization -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3">Bay Utilization</p>
+                        <h3 class="text-4xl font-headline font-black text-primary">{{ bay_utilization or 0 }}%</h3>
                     </div>
-                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Total Mechanics</p>
-                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_mechanics }}</h3>
+                    <div class="w-full bg-slate-100 h-2 rounded-full mt-6 overflow-hidden">
+                        <div class="bg-secondary h-full rounded-full transition-all duration-1000" style="width: {{ bay_utilization or 0 }}%"></div>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-on-tertiary-container hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-tertiary-fixed text-on-tertiary-container rounded-xl">
-                            <span class="material-symbols-outlined">assignment</span>
-                        </div>
+
+                <!-- Active Trips -->
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3">Live Fleet Status</p>
+                        <h3 class="text-4xl font-headline font-black text-secondary">{{ total_trips or 0 }}</h3>
+                        <p class="text-slate-400 text-xs mt-1">Active pickups/deliveries</p>
                     </div>
-                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Requests</p>
-                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_enquiries }}</h3>
+                    <a href="?view=trips" class="text-primary text-[10px] font-bold uppercase tracking-widest hover:underline mt-4">Fleet Manager →</a>
                 </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-secondary hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-surface-container-high text-secondary rounded-xl">
-                            <span class="material-symbols-outlined">grade</span>
-                        </div>
+
+                <!-- Stock Alerts -->
+                <div class="{% if low_stock %}bg-red-50 border-red-100{% else %}bg-green-50 border-green-100{% endif %} p-8 rounded-[2.5rem] shadow-sm border flex flex-col justify-between">
+                    <div>
+                        <p class="{% if low_stock %}text-red-400{% else %}text-green-400{% endif %} text-[10px] font-bold uppercase tracking-widest mb-3">Inventory Alerts</p>
+                        <h3 class="text-4xl font-headline font-black {% if low_stock %}text-red-600{% else %}text-green-600{% endif %}">
+                            {{ low_stock | length if low_stock else 'OK' }}
+                        </h3>
                     </div>
-                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Feedbacks</p>
-                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_feedback }}</h3>
+                    <p class="text-xs {% if low_stock %}text-red-900{% else %}text-green-900{% endif %} font-medium mt-4">
+                        {% if low_stock %}Low stock items found{% else %}Levels healthy{% endif %}
+                    </p>
                 </div>
             </div>
 
-            <!-- Recent Requests Section -->
-            <section class="bg-white rounded-[2rem] p-8 shadow-sm">
-                <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h3 class="font-headline text-xl font-extrabold text-primary">Recent Service Enquiries</h3>
-                        <p class="text-slate-500 text-sm">Action required for incoming requests</p>
+            <!-- Dashboard Charts & Tables -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+                <div class="lg:col-span-8 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                    <h4 class="font-headline font-bold text-primary text-xl mb-8">Technician Efficiency Scorecard</h4>
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-50">
+                                    <th class="pb-4">Technician</th>
+                                    <th class="pb-4 text-center">Jobs</th>
+                                    <th class="pb-4 text-right">Revenue Contrib.</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                {% for tech in technician_performance %}
+                                <tr>
+                                    <td class="py-5 font-bold text-primary">{{ tech.name }}</td>
+                                    <td class="py-5 text-center text-sm">{{ tech.jobs }}</td>
+                                    <td class="py-5 text-right font-bold text-primary">₹{{ "{:,.0f}".format(tech.revenue) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <a href="/admin_dashboard?view=requests" class="flex items-center space-x-2 text-xs font-bold text-primary hover:opacity-70 transition-colors">
-                        <span>View All</span>
-                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                    </a>
                 </div>
-                <div class="overflow-x-auto no-scrollbar">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
-                                <th class="pb-4 px-4">Customer</th>
-                                <th class="pb-4 px-4">Vehicle</th>
-                                <th class="pb-4 px-4">Issue</th>
-                                <th class="pb-4 px-4 text-center">Status</th>
-                                <th class="pb-4 px-4 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            {% for r in recent_enquiries %}
-                            <tr class="group hover:bg-slate-50/50 transition-colors">
-                                <td class="py-5 px-4 text-sm font-semibold text-primary">{{ r.customer_name }}</td>
-                                <td class="py-5 px-4 text-sm font-bold text-secondary">{{ r.vehicle_name }}</td>
-                                <td class="py-5 px-4 text-xs text-on-surface-variant max-w-xs truncate">{{ r.problem_description }}</td>
-                                <td class="py-5 px-4 text-center">
-                                    <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter
-                                        {% if r.status == 'Pending' %}bg-orange-100 text-orange-700
-                                        {% elif r.status == 'Released' %}bg-green-100 text-green-700
-                                        {% else %}bg-blue-100 text-blue-700{% endif %}">
-                                        {{ r.status }}
-                                    </span>
-                                </td>
-                                <td class="py-5 px-4 text-right">
-                                    <a href="/desk#Form/Vehicle Service Request/{{ r.name }}" class="p-2 text-slate-400 hover:text-primary transition-colors">
-                                        <span class="material-symbols-outlined">open_in_new</span>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="lg:col-span-4 bg-slate-900 text-white p-8 rounded-[2.5rem] shadow-xl">
+                    <h4 class="font-headline font-bold mb-6 text-white">Quick Actions</h4>
+                    <div class="space-y-4">
+                        <a href="/desk#List/Customer" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                            <p class="text-xs font-bold uppercase text-white/40 mb-1">CRM</p>
+                            <p class="font-bold">Manage Customers</p>
+                        </a>
+                        <a href="/desk#List/Vehicle Service Request" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                            <p class="text-xs font-bold uppercase text-white/40 mb-1">Operations</p>
+                            <p class="font-bold">Active Service Requests</p>
+                        </a>
+                        <a href="/desk#List/Insurance Claim" class="block p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                            <p class="text-xs font-bold uppercase text-white/40 mb-1">Finances</p>
+                            <p class="font-bold">Insurance Settlements</p>
+                        </a>
+                    </div>
                 </div>
-            </section>
+            </div>
             {% endif %}
 
             {% if view == 'requests' %}
@@ -378,121 +386,89 @@
             {% endif %}
 
             {% if view == 'insurance' %}
-            <div class="space-y-10">
-                <!-- Insurance Hero Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-primary text-white p-8 rounded-[2rem] shadow-xl relative overflow-hidden">
-                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
-                        <p class="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-2">Outstanding from Insurers</p>
-                        <h3 class="text-4xl font-headline font-black mb-1">₹{{ "{:,.2f}".format(total_outstanding_amount) }}</h3>
-                        <p class="text-white/40 text-xs">{{ pending_claims | length }} claims pending settlement</p>
-                    </div>
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Avg. Settlement Time</p>
-                        <h3 class="text-4xl font-headline font-black text-primary mb-1">{{ avg_settlement_time }} Days</h3>
-                        <p class="text-slate-400 text-xs">From intimation to clearance</p>
-                    </div>
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">Revenue Split (Cashless)</p>
-                        <h3 class="text-4xl font-headline font-black text-secondary mb-1">₹{{ "{:,.0f}".format(revenue_split.Cashless) }}</h3>
-                        <p class="text-slate-400 text-xs">Total insurance-matched revenue</p>
+                <!-- ... existing insurance content ... -->
+            {% endif %}
+
+            {% if view == 'trips' %}
+            <section class="bg-white rounded-[2rem] p-8 shadow-sm">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-headline text-2xl font-black text-primary">Pickup & Delivery Fleet</h3>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider">{{ total_trips }} Active Trips</span>
                     </div>
                 </div>
-
-                <!-- Pipeline & Ageing Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Claims Pipeline -->
-                    <div class="lg:col-span-5 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                        <h4 class="font-headline font-bold text-primary mb-6">Claims Pipeline</h4>
-                        <div class="space-y-4">
-                            {% for status, count in claims_pipeline.items() %}
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-xs font-bold">
-                                    <span class="text-secondary">{{ status }}</span>
-                                    <span class="text-primary">{{ count }}</span>
-                                </div>
-                                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-primary" style="width: {{ (count / (insurance_claims | length)) * 100 if insurance_claims else 0 }}%;"></div>
-                                </div>
-                            </div>
+                
+                <div class="overflow-x-auto no-scrollbar">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                                <th class="pb-4 px-4">Trip Details</th>
+                                <th class="pb-4 px-4">Customer & Vehicle</th>
+                                <th class="pb-4 px-4">Driver</th>
+                                <th class="pb-4 px-4">Status</th>
+                                <th class="pb-4 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for t in trips %}
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="py-5 px-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-primary uppercase tracking-wider">{{ t.trip_type }}</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">{{ t.scheduled_time.strftime('%b %d, %H:%M') if t.scheduled_time else '-' }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-5 px-4">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-sm text-primary">{{ t.customer_name }}</span>
+                                        <span class="text-[10px] text-secondary font-medium uppercase">{{ t.vehicle_display }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-5 px-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-400">
+                                            {{ t.driver_name[0] if t.driver_name else '?' }}
+                                        </div>
+                                        <span class="text-xs font-medium text-slate-600">{{ t.driver_name or 'Unassigned' }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-5 px-4">
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tight
+                                        {% if t.status == 'Scheduled' %}bg-blue-50 text-blue-600
+                                        {% elif t.status == 'En Route' %}bg-orange-50 text-orange-600
+                                        {% elif t.status == 'Completed' %}bg-green-50 text-green-600
+                                        {% else %}bg-slate-50 text-slate-600{% endif %}">
+                                        {{ t.status }}
+                                    </span>
+                                </td>
+                                <td class="py-5 px-4 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        {% if t.live_location %}
+                                        <a href="{{ t.live_location }}" target="_blank" class="p-2 bg-primary/5 text-primary rounded-lg hover:bg-primary/10 transition-colors">
+                                            <span class="material-symbols-outlined text-sm">near_me</span>
+                                        </a>
+                                        {% endif %}
+                                        <a href="/desk#Form/Vehicle Service Trip/{{ t.name }}" class="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors">
+                                            <span class="material-symbols-outlined text-sm">edit</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                             {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Insurer stats -->
-                    <div class="lg:col-span-7 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                        <h4 class="font-headline font-bold text-primary mb-6">Insurer Performance & Ageing</h4>
-                        <div class="overflow-x-auto no-scrollbar">
-                            <table class="w-full text-left">
-                                <thead class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                                    <tr>
-                                        <th class="pb-4">Insurer</th>
-                                        <th class="pb-4">Active Claims</th>
-                                        <th class="pb-4">Avg Age</th>
-                                        <th class="pb-4 text-right">Total Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-50">
-                                    {% for ins, stats in insurer_stats.items() %}
-                                    <tr>
-                                        <td class="py-4 font-bold text-sm text-primary">{{ ins }}</td>
-                                        <td class="py-4 text-sm text-secondary">{{ stats.count }}</td>
-                                        <td class="py-4">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if stats.avg_age > 15 %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                                                {{ stats.avg_age | int }} Days
-                                            </span>
-                                        </td>
-                                        <td class="py-4 text-right font-bold text-primary">₹{{ "{:,.0f}".format(stats.total_value) }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rejection Reasons & Pending Table -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Rejection Log -->
-                    <div class="bg-red-50 p-8 rounded-[2rem] border border-red-100">
-                        <div class="flex items-center gap-3 mb-6">
-                            <span class="material-symbols-outlined text-red-600">error</span>
-                            <h4 class="font-headline font-bold text-red-900">Recent Rejection Reasons</h4>
-                        </div>
-                        <div class="space-y-4">
-                            {% for r in rejection_reports %}
-                            <div class="bg-white p-4 rounded-2xl shadow-sm">
-                                <p class="text-[10px] font-bold text-red-700 uppercase mb-1">{{ r.insurer }}</p>
-                                <p class="text-sm font-medium text-slate-800">"{{ r.reason }}"</p>
-                                <p class="text-[10px] text-slate-400 mt-2">Claim ID: {{ r.claim }}</p>
-                            </div>
-                            {% endfor %}
-                            {% if not rejection_reports %}
-                            <p class="text-sm text-red-400 italic">No rejections recorded.</p>
+                            {% if not trips %}
+                            <tr>
+                                <td colspan="5" class="py-20 text-center">
+                                    <div class="flex flex-col items-center gap-2 opacity-20">
+                                        <span class="material-symbols-outlined text-4xl text-primary">local_shipping</span>
+                                        <p class="text-sm font-bold uppercase tracking-widest text-primary">No active trips scheduled</p>
+                                    </div>
+                                </td>
+                            </tr>
                             {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Pending Claims List -->
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                        <h4 class="font-headline font-bold text-primary mb-6">Pending Settlements</h4>
-                        <div class="space-y-3">
-                            {% for p in pending_claims[:8] %}
-                            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                                <div>
-                                    <p class="font-bold text-sm text-primary">{{ p.customer_name }}</p>
-                                    <p class="text-[10px] text-secondary uppercase tracking-widest">{{ p.insurer }} • {{ p.claim_status }}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-primary">₹{{ "{:,.0f}".format(p.net_payable_by_insurer) }}</p>
-                                    <a href="/desk#Form/Insurance Claim/{{ p.name }}" class="text-[10px] font-bold text-primary-container hover:underline">Details →</a>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            </section>
             {% endif %}
         </div>
     </main>

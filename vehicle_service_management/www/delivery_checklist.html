@@ -1,0 +1,109 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Quality Handover Checklist{% endblock %}
+
+{% block head_include %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block page_content %}
+<div class="bg-slate-50 min-h-screen font-inter pb-20">
+    <header class="bg-violet-600 text-white p-6 shadow-lg">
+        <div class="max-w-md mx-auto flex items-center gap-4">
+            <a href="/mechanic_dashboard" class="text-white/80">←</a>
+            <div>
+                <h1 class="text-xl font-manrope font-extrabold tracking-tight">QUALITY CHECK</h1>
+                <p class="text-xs text-violet-100 uppercase tracking-widest font-bold">Pre-handover Protocol</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-6">
+        <form id="checklist-form" class="space-y-6" onsubmit="return saveChecklist(event)">
+            <input type="hidden" id="request_name" value="{{ frappe.form_dict.request }}">
+            
+            <section class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-violet-50 p-4 border-b border-violet-100">
+                    <h2 class="text-violet-700 font-bold text-xs uppercase tracking-widest">Mandatory Checkpoints</h2>
+                </div>
+                <div class="divide-y divide-slate-50" id="checklist-items">
+                    {% set defaults = ["Oil Levels Checked", "Tyre Pressure Verified", "Brakes Tested", "Electrical Dashboard Functioning", "Cleanliness & Polish", "Fluid Leak Inspection"] %}
+                    {% for point in defaults %}
+                    <div class="p-5 flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-slate-700">{{ point }}</span>
+                            <select class="check-status bg-slate-100 border-none rounded-lg text-xs font-bold px-2 py-1" data-point="{{ point }}">
+                                <option value="Pass">Pass</option>
+                                <option value="Fail">Fail</option>
+                                <option value="N/A">N/A</option>
+                            </select>
+                        </div>
+                        <input type="text" class="check-notes bg-slate-50 border-none rounded-lg text-xs py-2 px-3 placeholder:text-slate-300" placeholder="Optional notes..." data-point="{{ point }}">
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-bold text-slate-700 uppercase tracking-tight">Handover Clearance</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="is_cleared" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600"></div>
+                    </label>
+                </div>
+                <textarea id="final_remarks" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 text-sm font-medium" rows="3" placeholder="Final technical summary..."></textarea>
+            </section>
+
+            <button type="submit" class="w-full bg-violet-600 text-white py-4 rounded-2xl font-bold uppercase tracking-widest shadow-lg shadow-violet-200 active:scale-95 transition-all">
+                Authorize Release
+            </button>
+        </form>
+    </main>
+</div>
+
+<script>
+function saveChecklist(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true; btn.textContent = 'AUTHORIZING...';
+
+    const items = [];
+    document.querySelectorAll('.check-status').forEach(select => {
+        const point = select.getAttribute('data-point');
+        const notesInput = document.querySelector(`.check-notes[data-point="${point}"]`);
+        items.push({
+            check_point: point,
+            status: select.value,
+            notes: notesInput.value,
+        });
+    });
+
+    frappe.call({
+        method: 'vehicle_service_management.api.save_delivery_checklist',
+        args: {
+            request_name: document.getElementById('request_name').value,
+            items: JSON.stringify(items),
+            is_cleared: document.getElementById('is_cleared').checked ? 1 : 0,
+            final_remarks: document.getElementById('final_remarks').value,
+        },
+        callback: function(r) {
+            if(r.message && r.message.status === 'success') {
+                alert('Handover Authorized!');
+                window.location.href = '/mechanic_dashboard';
+            } else {
+                btn.disabled = false; btn.textContent = 'Authorize Release';
+                alert('Error submitting checklist.');
+            }
+        },
+        error: function() {
+            btn.disabled = false; btn.textContent = 'Authorize Release';
+            alert('Something went wrong.');
+        }
+    });
+    return false;
+}
+</script>
+{% endblock %}

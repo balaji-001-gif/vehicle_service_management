@@ -27,7 +27,53 @@ def get_context(context):
 		context.total_mechanics = stats.get("total_mechanics", 0)
 		context.total_enquiries = stats.get("total_enquiries", 0)
 		context.total_feedback = stats.get("total_feedback", 0)
+		context.total_trips = stats.get("total_trips", 0)
 		context.recent_enquiries = stats.get("recent_enquiries", [])
+
+		# 1. Bay Utilization
+		bays = frappe.get_all("Vehicle Service Bay", fields=["bay_status"])
+		if bays:
+			busy = len([b for b in bays if b.bay_status == "In Progress"])
+			context.bay_utilization = flt((busy / len(bays)) * 100, 1)
+		else:
+			context.bay_utilization = 0.0
+
+		# 2. Revenue & Profit Trends
+		active_reqs = frappe.get_all("Vehicle Service Request", 
+			fields=["name", "cost", "status", "mechanic"], 
+			filters={"status": ["!=", "Cancelled"]})
+		
+		total_rev = sum(flt(r.cost) for r in active_reqs)
+		total_cost_spares = 0.0
+		for r in active_reqs:
+			spares = frappe.get_all("Consumed Spare", filters={"parent": r.name}, fields=["amount"])
+			total_cost_spares += sum(flt(s.amount) for s in spares)
+		
+		context.total_revenue = total_rev
+		context.total_profit = total_rev - total_cost_spares
+		context.profit_margin = flt((context.total_profit / total_rev * 100) if total_rev > 0 else 0, 1)
+
+		# 3. Technician Performance
+		tech_stats = {}
+		for r in active_reqs:
+			if r.mechanic:
+				if r.mechanic not in tech_stats:
+					tech_stats[r.mechanic] = {"name": "", "jobs": 0, "revenue": 0.0}
+				tech_stats[r.mechanic]["jobs"] += 1
+				tech_stats[r.mechanic]["revenue"] += flt(r.cost)
+		
+		performance_list = []
+		for tech_id, tdata in tech_stats.items():
+			tdata["name"] = frappe.db.get_value("Vehicle Mechanic", tech_id, "mechanic_name") or tech_id
+			performance_list.append(tdata)
+		
+		context.technician_performance = sorted(performance_list, key=lambda x: x["revenue"], reverse=True)[:5]
+
+		# 4. Low Stock Alerts
+		context.low_stock = frappe.get_all("Item", 
+			filters={"is_stock_item": 1}, 
+			fields=["item_code", "item_name"], 
+			limit=5)
 	elif view == "customers":
 		context.customers = frappe.get_all("Customer", fields=["name", "customer_name", "mobile_no", "customer_type", "email_id"], order_by="modified desc", limit=100)
 	elif view == "mechanics":
@@ -114,14 +160,15 @@ def get_context(context):
 		for c in claims:
 			ins = c.insurer or "Unknown"
 			if ins not in insurer_stats:
-				insurer_stats[ins] = {"count": 0, "total_value": 0, "avg_age": 0}
+				insurer_stats[ins] = {"count": 0, "total_value": 0.0, "avg_age": 0.0}
 			
 			insurer_stats[ins]["count"] += 1
 			insurer_stats[ins]["total_value"] += flt(c.net_payable_by_insurer)
 			
 			if c.claim_status != "Settled":
 				age = date_diff(nowdate(), (c.get("claim_intimation_date") or c.creation))
-				insurer_stats[ins]["avg_age"] = (insurer_stats[ins]["avg_age"] * (insurer_stats[ins]["count"]-1) + age) / insurer_stats[ins]["count"]
+				count = insurer_stats[ins]["count"]
+				insurer_stats[ins]["avg_age"] = (insurer_stats[ins]["avg_age"] * (count-1) + age) / count
 
 			if c.claim_status == "Rejected" and c.get("rejection_reason"):
 				rejections.append({"insurer": ins, "reason": c.rejection_reason, "claim": c.name})
@@ -140,3 +187,11 @@ def get_context(context):
 		context.pending_claims = [c for c in claims if c.claim_status not in ["Settled", "Rejected"]]
 		context.total_outstanding_amount = sum(flt(c.net_payable_by_insurer) for c in context.pending_claims)
 		context.insurance_claims = claims
+	elif view == "trips":
+		context.trips = frappe.get_all("Vehicle Service Trip", fields=["name", "service_request", "customer", "vehicle", "trip_type", "status", "scheduled_time", "driver", "live_location"], order_by="scheduled_time desc", limit=100)
+		for t in context.trips:
+			t.customer_name = frappe.db.get_value("Customer", t.customer, "customer_name") or t.customer
+			t.driver_name = frappe.db.get_value("Vehicle Mechanic", t.driver, "mechanic_name") or ""
+			# Get vehicle info
+			v = frappe.db.get_value("Vehicle Master", t.vehicle, ["make", "model"], as_dict=True)
+			t.vehicle_display = f"{v.make} {v.model}" if v else t.vehicle

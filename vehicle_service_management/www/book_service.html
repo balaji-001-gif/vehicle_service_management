@@ -196,11 +196,42 @@
                 </div>
             </section>
 
+            <!-- Section: Pickup & Delivery -->
+            <section>
+                <div class="flex items-center justify-between mb-4 border-l-4 border-orange-500 pl-3">
+                    <h2 class="font-headline font-bold text-lg text-primary">PICKUP & DELIVERY</h2>
+                    <span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full uppercase">Step 03</span>
+                </div>
+                <div class="space-y-4 bg-surface-container-low p-4 rounded-xl border border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">local_shipping</span>
+                            <div>
+                                <p class="text-xs font-bold text-primary uppercase tracking-wider">Concierge Service</p>
+                                <p class="text-[10px] text-secondary font-medium uppercase tracking-tight">Pickup & Drop-off at your location</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="request_pickup" class="sr-only peer" onchange="togglePickupDetails()">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div id="pickup-details" class="hidden space-y-4 animate-in slide-in-from-top duration-300">
+                        <div class="group">
+                            <label class="block font-label text-[10px] font-bold text-secondary uppercase tracking-widest mb-1 ml-1">Service Address</label>
+                            <div class="bg-surface-container-high rounded-md ghost-border-focus transition-all">
+                                <textarea class="w-full bg-transparent border-none focus:ring-0 py-3 px-3 text-sm font-medium resize-none" id="pickup_address" placeholder="Enter full address for pickup and delivery..." rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Section: Service Needs -->
             <section>
                 <div class="flex items-center justify-between mb-4 border-l-4 border-secondary pl-3">
                     <h2 class="font-headline font-bold text-lg text-primary">SERVICE DESCRIPTION</h2>
-                    <span class="text-[10px] font-bold text-secondary-container bg-secondary-fixed-dim text-on-secondary-fixed-variant px-2 py-0.5 rounded-full uppercase">Step 03</span>
+                    <span class="text-[10px] font-bold text-secondary-container bg-secondary-fixed-dim text-on-secondary-fixed-variant px-2 py-0.5 rounded-full uppercase">Step 04</span>
                 </div>
                 <div class="group">
                     <label class="block font-label text-[10px] font-bold text-secondary uppercase tracking-widest mb-1 ml-1">Observation Details</label>
@@ -247,6 +278,18 @@
 </div>
 
 <script>
+function togglePickupDetails() {
+    var details = document.getElementById('pickup-details');
+    var checkbox = document.getElementById('request_pickup');
+    if (checkbox.checked) {
+        details.classList.remove('hidden');
+        document.getElementById('pickup_address').required = true;
+    } else {
+        details.classList.add('hidden');
+        document.getElementById('pickup_address').required = false;
+    }
+}
+
 function submitBooking(e) {
     e.preventDefault();
 
@@ -268,6 +311,8 @@ function submitBooking(e) {
             vehicle_no: vehicleNo,
             category: document.getElementById('category').value,
             problem_description: document.getElementById('problem_description').value,
+            request_pickup: document.getElementById('request_pickup').checked ? 1 : 0,
+            pickup_address: document.getElementById('pickup_address').value,
         },
         callback: function(r) {
             if (r.message && r.message.status === 'success') {

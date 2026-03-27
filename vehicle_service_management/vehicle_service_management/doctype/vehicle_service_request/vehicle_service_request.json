@@ -12,6 +12,8 @@
   "date",
   "column_break_general",
   "status",
+  "request_pickup",
+  "pickup_address",
   "section_vehicle",
   "vehicle",
   "category",
@@ -63,6 +65,18 @@
    "in_list_view": 1,
    "label": "Status",
    "options": "Pending\nQuoted\nApproved\nRepairing\nRepairing Done\nReleased"
+  },
+  {
+   "default": "0",
+   "fieldname": "request_pickup",
+   "fieldtype": "Check",
+   "label": "Request Pickup & Delivery"
+  },
+  {
+   "depends_on": "eval:doc.request_pickup==1",
+   "fieldname": "pickup_address",
+   "fieldtype": "Small Text",
+   "label": "Pickup/Delivery Address"
   },
   {
    "fieldname": "section_vehicle",

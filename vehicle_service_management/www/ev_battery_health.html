@@ -1,0 +1,113 @@
+{% extends "templates/web.html" %}
+
+{% block title %}EV Battery Health Check{% endblock %}
+
+{% block head_include %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block page_content %}
+<div class="bg-slate-50 min-h-screen font-inter pb-20">
+    <header class="bg-emerald-600 text-white p-6 shadow-lg">
+        <div class="max-w-md mx-auto flex items-center gap-4">
+            <a href="/mechanic_dashboard" class="text-white/80">←</a>
+            <div>
+                <h1 class="text-xl font-manrope font-extrabold tracking-tight">EV DIAGNOSTICS</h1>
+                <p class="text-xs text-emerald-100 uppercase tracking-widest font-bold">Battery Health Template</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-6">
+        <form id="ev-form" class="space-y-6" onsubmit="return saveEV(event)">
+            <input type="hidden" id="request_name" value="{{ frappe.form_dict.request }}">
+            
+            <section class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-4">
+                <h2 class="text-emerald-700 font-bold text-sm uppercase tracking-wider mb-4">Battery Parameters</h2>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">State of Health (SoH %)</label>
+                    <input type="number" id="soh" step="0.1" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 font-bold text-emerald-600" placeholder="e.g. 94.5" required>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Current Charge (%)</label>
+                    <input type="number" id="battery_pct" step="0.1" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 font-bold text-slate-700" placeholder="e.g. 80.0" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Voltage (V)</label>
+                        <input type="number" id="voltage" step="0.1" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 font-bold text-slate-700" placeholder="380.0" required>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Temp (°C)</label>
+                        <input type="number" id="temp" step="0.1" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 font-bold text-slate-700" placeholder="35.0" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cycle Count</label>
+                    <input type="number" id="cycles" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 font-bold text-slate-700" placeholder="120" required>
+                </div>
+            </section>
+
+            <section class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 text-emerald-700">Health Status</label>
+                <select id="status" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 font-bold text-slate-700">
+                    <option value="Healthy">Healthy</option>
+                    <option value="Degraded">Degraded</option>
+                    <option value="Critical">Critical</option>
+                    <option value="Requires Replacement">Requires Replacement</option>
+                </select>
+            </section>
+
+            <section class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Diagnostic Notes</label>
+                <textarea id="remarks" class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 text-sm font-medium" rows="4" placeholder="Enter findings..."></textarea>
+            </section>
+
+            <button type="submit" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold uppercase tracking-widest shadow-lg shadow-emerald-200 active:scale-95 transition-all">
+                Save Health Check
+            </button>
+        </form>
+    </main>
+</div>
+
+<script>
+function saveEV(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true; btn.textContent = 'SAVING...';
+
+    frappe.call({
+        method: 'vehicle_service_management.api.save_ev_battery_health',
+        args: {
+            request_name: document.getElementById('request_name').value,
+            battery_pct: document.getElementById('battery_pct').value,
+            soh: document.getElementById('soh').value,
+            voltage: document.getElementById('voltage').value,
+            temp: document.getElementById('temp').value,
+            cycles: document.getElementById('cycles').value,
+            remarks: document.getElementById('remarks').value,
+        },
+        callback: function(r) {
+            if(r.message && r.message.status === 'success') {
+                alert('EV Diagnostics Saved!');
+                window.location.href = '/mechanic_dashboard';
+            } else {
+                btn.disabled = false; btn.textContent = 'Save Health Check';
+                alert('Error saving data.');
+            }
+        },
+        error: function() {
+            btn.disabled = false; btn.textContent = 'Save Health Check';
+            alert('Something went wrong.');
+        }
+    });
+    return false;
+}
+</script>
+{% endblock %}

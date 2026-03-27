@@ -63,4 +63,18 @@ def get_context(context):
     if vehicle_id:
         context.vehicle = frappe.get_doc("Vehicle Master", vehicle_id)
 
+    # 4. Fetch Loyalty Points
+    points_data = frappe.db.get_all(
+        "Loyalty Point Entry",
+        filters={"customer": customer},
+        fields=["points", "type"]
+    )
+    total_points = 0
+    for p in points_data:
+        if p.type == "Earned":
+            total_points += p.points
+        else:
+            total_points -= p.points
+    context.loyalty_points = total_points
+
     return context
