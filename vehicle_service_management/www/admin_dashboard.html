@@ -1,578 +1,353 @@
 {% extends "templates/web.html" %}
 
-{% block title %}Admin Dashboard — Vehicle Service Management{% endblock %}
+{% block title %}Admin Dashboard - Precision{% endblock %}
 
 {% block head_include %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#001944",
+                    "primary-container": "#002c6e",
+                    "surface": "#f8f9fb",
+                    "surface-container-low": "#f2f4f6",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface": "#191c1e",
+                    "on-surface-variant": "#454652",
+                    "outline": "#767683",
+                    "secondary": "#4c616c",
+                    "tertiary": "#331000",
+                    "tertiary-fixed": "#ffdbcb",
+                    "tertiary-fixed-dim": "#ffb692",
+                    "on-tertiary-container": "#fb6b00"
+                },
+                fontFamily: {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"]
+                }
+            }
+        }
+    }
+</script>
 <style>
-:root {
-	--bg: #f1f5f9;
-	--card: #ffffff;
-	--text: #1e293b;
-	--text-muted: #64748b;
-	--border: #e2e8f0;
-	--primary: #2563eb;
-	--shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-	--shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-.admin-page {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-	background: var(--bg);
-	min-height: 100vh;
-}
-
-/* Layout */
-.admin-layout {
-	display: flex;
-	min-height: 100vh;
-}
-
-/* Sidebar */
-.admin-sidebar {
-	width: 240px;
-	background: var(--card);
-	border-right: 1px solid var(--border);
-	padding: 1.5rem 0;
-	flex-shrink: 0;
-}
-.sidebar-brand {
-	padding: 0 1.25rem 1.5rem;
-	font-weight: 700;
-	font-size: 0.95rem;
-	color: var(--text);
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	border-bottom: 1px solid var(--border);
-}
-.sidebar-brand span { font-size: 1.25rem; }
-.sidebar-nav {
-	list-style: none;
-	padding: 1rem 0;
-}
-.sidebar-nav li a {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	padding: 0.7rem 1.25rem;
-	color: var(--text-muted);
-	text-decoration: none;
-	font-size: 0.9rem;
-	font-weight: 500;
-	transition: all 0.15s;
-	border-left: 3px solid transparent;
-}
-.sidebar-nav li a:hover,
-.sidebar-nav li a.active {
-	color: var(--primary);
-	background: #eff6ff;
-	border-left-color: var(--primary);
-}
-.sidebar-nav li a .icon { font-size: 1.1rem; width: 1.5rem; text-align: center; }
-
-/* Main */
-.admin-main {
-	flex: 1;
-	padding: 2rem;
-	overflow-x: auto;
-}
-.admin-main h1 {
-	font-size: 1.5rem;
-	font-weight: 700;
-	color: var(--text);
-	margin-bottom: 1.5rem;
-}
-
-/* Stats Cards */
-.stats-grid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 1rem;
-	margin-bottom: 2rem;
-}
-.stat-card {
-	border-radius: 14px;
-	padding: 1.25rem;
-	color: white;
-	text-align: center;
-	box-shadow: var(--shadow-lg);
-	transition: transform 0.2s;
-}
-.stat-card:hover { transform: translateY(-2px); }
-.stat-card .stat-icon {
-	font-size: 1.75rem;
-	margin-bottom: 0.5rem;
-	opacity: 0.9;
-}
-.stat-card .stat-number {
-	font-size: 2rem;
-	font-weight: 800;
-}
-.stat-card .stat-label {
-	font-size: 0.8rem;
-	font-weight: 600;
-	opacity: 0.9;
-	margin-top: 0.25rem;
-}
-.stat-card.purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-.stat-card.green  { background: linear-gradient(135deg, #22c55e, #16a34a); }
-.stat-card.orange { background: linear-gradient(135deg, #f97316, #ea580c); }
-.stat-card.red    { background: linear-gradient(135deg, #ef4444, #dc2626); }
-
-/* Table */
-.table-card {
-	background: var(--card);
-	border-radius: 14px;
-	box-shadow: var(--shadow);
-	overflow: hidden;
-}
-.table-card .table-title {
-	padding: 1rem 1.5rem;
-	font-size: 1rem;
-	font-weight: 700;
-	color: var(--primary);
-	border-bottom: 1px solid var(--border);
-	text-align: center;
-}
-.table-card table {
-	width: 100%;
-	border-collapse: collapse;
-}
-.table-card th {
-	text-align: left;
-	padding: 0.75rem 1rem;
-	font-size: 0.78rem;
-	font-weight: 600;
-	color: var(--text-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	border-bottom: 1px solid var(--border);
-	background: #f8fafc;
-}
-.table-card td {
-	padding: 0.75rem 1rem;
-	font-size: 0.875rem;
-	color: var(--text);
-	border-bottom: 1px solid var(--border);
-}
-.table-card tr:last-child td { border-bottom: none; }
-.table-card tr:hover td { background: #f8fafc; }
-
-/* Status Pill */
-.status-pill {
-	display: inline-block;
-	padding: 0.2rem 0.6rem;
-	border-radius: 12px;
-	font-size: 0.72rem;
-	font-weight: 600;
-}
-.status-pill.pending         { background: #fef3c7; color: #92400e; }
-.status-pill.approved        { background: #dbeafe; color: #1e40af; }
-.status-pill.repairing       { background: #fce7f3; color: #9d174d; }
-.status-pill.repairing-done  { background: #d1fae5; color: #065f46; }
-.status-pill.released        { background: #dcfce7; color: #166534; }
-
-/* Actions */
-.action-cell select {
-	padding: 0.35rem;
-	border: 1px solid var(--border);
-	border-radius: 6px;
-	font-size: 0.75rem;
-	font-weight: 500;
-	background: white;
-	color: var(--text);
-	cursor: pointer;
-	outline: none;
-}
-.action-cell select:focus { border-color: var(--primary); }
-
-/* No data */
-.no-data {
-	text-align: center;
-	padding: 3rem;
-	color: var(--text-muted);
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-	.admin-sidebar { display: none; }
-	.admin-main { padding: 1rem; }
-	.stats-grid { grid-template-columns: repeat(2, 1fr); }
-	.admin-main h1 { font-size: 1.25rem; }
-}
-@media (max-width: 500px) {
-	.stats-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-	.stat-card { padding: 1rem; }
-	.stat-card .stat-number { font-size: 1.5rem; }
-	.table-card { font-size: 0.8rem; }
-	.table-card th, .table-card td { padding: 0.5rem 0.6rem; }
-}
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
 </style>
 {% endblock %}
 
 {% block page_content %}
-<div class="admin-page">
-	<div class="admin-layout">
-		<!-- Sidebar -->
-		<aside class="admin-sidebar">
-			<div class="sidebar-brand">
-				<span>🔧</span> Vehicle Service Mgmt
-			</div>
-			<ul class="sidebar-nav">
-				<li><a href="/admin-dashboard?view=dashboard" class="{% if view == 'dashboard' %}active{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
-				<li><a href="/admin-dashboard?view=customers" class="{% if view == 'customers' %}active{% endif %}"><span class="icon">👥</span> Customer</a></li>
-				<li><a href="/admin-dashboard?view=mechanics" class="{% if view == 'mechanics' %}active{% endif %}"><span class="icon">🔩</span> Mechanic</a></li>
-				<li><a href="/admin-dashboard?view=requests" class="{% if view == 'requests' %}active{% endif %}"><span class="icon">📋</span> Request</a></li>
-				<li><a href="/admin-dashboard?view=equipment" class="{% if view == 'equipment' %}active{% endif %}"><span class="icon">🏗️</span> Equipment</a></li>
-				<li><a href="/admin-dashboard?view=feedback" class="{% if view == 'feedback' %}active{% endif %}"><span class="icon">💬</span> Feedback</a></li>
-			</ul>
-		</aside>
+<div class="bg-surface font-body text-on-surface antialiased min-h-screen">
+    <!-- SideNavBar -->
+    <nav class="fixed left-0 top-0 h-screen w-64 z-50 bg-slate-50 border-r border-slate-200 flex flex-col p-6 space-y-2">
+        <div class="flex items-center space-x-3 mb-12">
+            <div class="w-10 h-10 bg-primary-container flex items-center justify-center rounded-xl">
+                <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black text-primary leading-tight">PRECISION</h1>
+                <p class="text-[10px] font-bold tracking-[0.2em] text-secondary uppercase">Admin Portal</p>
+            </div>
+        </div>
 
-		<!-- Main -->
-		<main class="admin-main">
-			{% if view == 'dashboard' %}
-			<h1>Dashboard</h1>
+        <div class="flex-1 space-y-1">
+            <a class="flex items-center px-4 py-3 rounded-lg transition-all duration-300 {% if view == 'dashboard' %}bg-white text-primary shadow-sm font-bold{% else %}text-slate-600 hover:bg-slate-100 hover:translate-x-1{% endif %}" href="/admin_dashboard?view=dashboard">
+                <span class="material-symbols-outlined mr-3 text-lg">dashboard</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a class="flex items-center px-4 py-3 rounded-lg transition-all duration-300 {% if view == 'requests' %}bg-white text-primary shadow-sm font-bold{% else %}text-slate-600 hover:bg-slate-100 hover:translate-x-1{% endif %}" href="/admin_dashboard?view=requests">
+                <span class="material-symbols-outlined mr-3 text-lg">assignment</span>
+                <span class="text-sm font-medium">Requests</span>
+            </a>
+            <a class="flex items-center px-4 py-3 rounded-lg transition-all duration-300 {% if view == 'mechanics' %}bg-white text-primary shadow-sm font-bold{% else %}text-slate-600 hover:bg-slate-100 hover:translate-x-1{% endif %}" href="/admin_dashboard?view=mechanics">
+                <span class="material-symbols-outlined mr-3 text-lg">build</span>
+                <span class="text-sm font-medium">Mechanics</span>
+            </a>
+            <a class="flex items-center px-4 py-3 rounded-lg transition-all duration-300 {% if view == 'customers' %}bg-white text-primary shadow-sm font-bold{% else %}text-slate-600 hover:bg-slate-100 hover:translate-x-1{% endif %}" href="/admin_dashboard?view=customers">
+                <span class="material-symbols-outlined mr-3 text-lg">group</span>
+                <span class="text-sm font-medium">Customers</span>
+            </a>
+            <a class="flex items-center px-4 py-3 rounded-lg transition-all duration-300 {% if view == 'equipment' %}bg-white text-primary shadow-sm font-bold{% else %}text-slate-600 hover:bg-slate-100 hover:translate-x-1{% endif %}" href="/admin_dashboard?view=equipment">
+                <span class="material-symbols-outlined mr-3 text-lg">precision_manufacturing</span>
+                <span class="text-sm font-medium">Equipment</span>
+            </a>
+            <a class="flex items-center px-4 py-3 rounded-lg transition-all duration-300 {% if view == 'feedback' %}bg-white text-primary shadow-sm font-bold{% else %}text-slate-600 hover:bg-slate-100 hover:translate-x-1{% endif %}" href="/admin_dashboard?view=feedback">
+                <span class="material-symbols-outlined mr-3 text-lg">star</span>
+                <span class="text-sm font-medium">Feedback</span>
+            </a>
+        </div>
 
-			<!-- Stats Cards -->
-			<div class="stats-grid">
-				<div class="stat-card purple">
-					<div class="stat-icon">👥</div>
-					<div class="stat-number">{{ total_customers }}</div>
-					<div class="stat-label">Total Customer</div>
-				</div>
-				<div class="stat-card green">
-					<div class="stat-icon">🔩</div>
-					<div class="stat-number">{{ total_mechanics }}</div>
-					<div class="stat-label">Total Mechanic</div>
-				</div>
-				<div class="stat-card orange">
-					<div class="stat-icon">📋</div>
-					<div class="stat-number">{{ total_enquiries }}</div>
-					<div class="stat-label">Total Enquiry</div>
-				</div>
-				<div class="stat-card red">
-					<div class="stat-icon">💬</div>
-					<div class="stat-number">{{ total_feedback }}</div>
-					<div class="stat-label">Total Feedback</div>
-				</div>
-			</div>
+        <div class="pt-6 border-t border-slate-200">
+            <a class="flex items-center px-4 py-4 text-slate-500 hover:text-error transition-colors" href="/?logout=true">
+                <span class="material-symbols-outlined mr-3">logout</span>
+                <span class="text-sm font-medium">Logout</span>
+            </a>
+        </div>
+    </nav>
 
-			<!-- Recent Enquiries -->
-			<div class="table-card">
-				<div class="table-title">Recent Enquiry By Customer</div>
-				{% if recent_enquiries %}
-				<div style="overflow-x: auto;">
-				<table>
-					<thead>
-						<tr>
-							<th>Customer Name</th>
-							<th>Vehicle Name</th>
-							<th>Category</th>
-							<th>Vehicle Model</th>
-							<th>Vehicle Brand</th>
-							<th>Problem Description</th>
-							<th>Status</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for r in recent_enquiries %}
-						<tr>
-							<td>{{ r.customer_name }}</td>
-							<td>{{ r.vehicle_name }}</td>
-							<td>{{ r.category or '-' }}</td>
-							<td>{{ r.vehicle_model }}</td>
-							<td>{{ r.vehicle_brand }}</td>
-							<td>{{ r.problem_description }}</td>
-							<td>
-								<span class="status-pill {{ r.status | lower | replace(' ', '-') }}">
-									{{ r.status }}
-								</span>
-							</td>
-							<td class="action-cell">
-								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">
-									<option value="" disabled selected>Update...</option>
-									{% set statuses = ["Pending", "Quoted", "Approved", "Repairing", "Repairing Done", "Released"] %}
-									{% for st in statuses %}
-									{% if r.status != st %}
-									<option value="{{ st }}">{{ st }}</option>
-									{% endif %}
-									{% endfor %}
-								</select>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				</div>
-				{% else %}
-				<div class="no-data">No enquiries yet.</div>
-				{% endif %}
-			</div>
+    <!-- Main Content Canvas -->
+    <main class="ml-64 min-h-screen">
+        <!-- TopAppBar -->
+        <header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 glass-header h-16 flex justify-between items-center px-8 border-b border-slate-100">
+            <div class="flex items-center flex-1 max-w-xl">
+                <div class="relative w-full">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-xl">search</span>
+                    <input class="w-full bg-slate-100 border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/10" placeholder="Search..." type="text"/>
+                </div>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-3 pl-4 border-l border-slate-200">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-primary">{{ frappe.session.user }}</p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest">Administrator</p>
+                    </div>
+                    <img class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/10" src="https://ui-avatars.com/api/?name=Admin&background=001944&color=fff"/>
+                </div>
+            </div>
+        </header>
 
-			{% elif view == 'customers' %}
-			<h1>Customers</h1>
-			<div class="table-card">
-				<div class="table-title">Customer Directory</div>
-				{% if customers %}
-				<div style="overflow-x: auto;">
-				<table>
-					<thead>
-						<tr>
-							<th>Customer ID</th>
-							<th>Name</th>
-							<th>Mobile No</th>
-							<th>Customer Type</th>
-							<th>Email</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for c in customers %}
-						<tr>
-							<td><strong>{{ c.name }}</strong></td>
-							<td>{{ c.customer_name }}</td>
-							<td>{{ c.mobile_no or '-' }}</td>
-							<td>{{ c.customer_type or '-' }}</td>
-							<td>{{ c.email_id or '-' }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				</div>
-				{% else %}
-				<div class="no-data">No customers found.</div>
-				{% endif %}
-			</div>
+        <!-- Dashboard Content -->
+        <div class="pt-24 px-8 pb-20 max-w-7xl">
+            {% if view == 'dashboard' %}
+            <!-- Hero Header -->
+            <div class="mb-10 flex items-end justify-between">
+                <div>
+                    <h2 class="font-headline text-3xl font-extrabold tracking-tight text-primary mb-1">System Overview</h2>
+                    <p class="text-secondary font-medium">Real-time workshop telemetry</p>
+                </div>
+                <div class="bg-surface-container-low px-4 py-2 rounded-xl flex items-center space-x-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-xs font-bold text-secondary uppercase tracking-tighter">Live Status: Optimal</span>
+                </div>
+            </div>
 
-			{% elif view == 'mechanics' %}
-			<h1>Mechanics</h1>
-			<div class="table-card">
-				<div class="table-title">Mechanic Roster</div>
-				{% if mechanics %}
-				<div style="overflow-x: auto;">
-				<table>
-					<thead>
-						<tr>
-							<th>Mechanic ID</th>
-							<th>Name</th>
-							<th>Status</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for m in mechanics %}
-						<tr>
-							<td><strong>{{ m.name }}</strong></td>
-							<td>{{ m.mechanic_name }}</td>
-							<td>
-								<span class="status-pill {% if m.status == 'Active' %}released{% else %}pending{% endif %}">
-									{{ m.status or 'Active' }}
-								</span>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				</div>
-				{% else %}
-				<div class="no-data">No mechanics found.</div>
-				{% endif %}
-			</div>
+            <!-- Stats Bento Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-primary hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-primary/5 text-primary rounded-xl">
+                            <span class="material-symbols-outlined">group</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Total Customers</p>
+                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_customers }}</h3>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-secondary hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-secondary/5 text-secondary rounded-xl">
+                            <span class="material-symbols-outlined">engineering</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Total Mechanics</p>
+                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_mechanics }}</h3>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-on-tertiary-container hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-tertiary-fixed text-on-tertiary-container rounded-xl">
+                            <span class="material-symbols-outlined">assignment</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Requests</p>
+                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_enquiries }}</h3>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-secondary hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-surface-container-high text-secondary rounded-xl">
+                            <span class="material-symbols-outlined">grade</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Feedbacks</p>
+                    <h3 class="font-headline text-3xl font-black text-primary">{{ total_feedback }}</h3>
+                </div>
+            </div>
 
-			{% elif view == 'requests' %}
-			<h1>Service Requests</h1>
-			<div class="table-card">
-				<div class="table-title">All Requests</div>
-				{% if requests %}
-				<div style="overflow-x: auto;">
-				<table>
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Date</th>
-							<th>Customer</th>
-							<th>Vehicle</th>
-							<th>Mechanic</th>
-							<th>Cost</th>
-							<th>Payment</th>
-							<th>Status</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for r in requests %}
-						<tr>
-							<td><strong>{{ r.name }}</strong></td>
-							<td>{{ r.date }}</td>
-							<td>{{ r.customer_name }}</td>
-							<td>{{ r.vehicle_name }}<br><span style="color: var(--text-muted); font-size: 0.75rem;">{{ r.category or '' }}</span></td>
-							<td>{{ r.mechanic_name or '-' }}</td>
-							<td>{{ '₹ ' ~ r.cost if r.cost else '-' }}</td>
-							<td>
-								{% if r.payment_status == 'Paid' %}
-								<span class="status-pill released">Paid</span>
-								{% else %}
-								<span class="status-pill pending">Unpaid</span>
-								{% endif %}
-							</td>
-							<td>
-								{% if r.service_bays %}
-								<div style="margin-bottom: 0.4rem; display: flex; flex-direction: column; gap: 0.2rem; align-items: flex-start;">
-									{% for bay in r.service_bays %}
-									<span style="font-size: 0.65rem; font-weight: 600; color: {% if bay.bay_status == 'Completed' %}#166534{% elif bay.bay_status == 'In Progress' %}#1e40af{% else %}#475569{% endif %}; background: {% if bay.bay_status == 'Completed' %}#dcfce7{% elif bay.bay_status == 'In Progress' %}#dbeafe{% else %}#f1f5f9{% endif %}; padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; white-space: nowrap; border: 1px solid {% if bay.bay_status == 'Completed' %}#bbf7d0{% elif bay.bay_status == 'In Progress' %}#bfdbfe{% else %}#e2e8f0{% endif %};">
-										{{ bay.bay_name }}: {{ bay.bay_status }}
-									</span>
-									{% endfor %}
-								</div>
-								{% endif %}
-								<span class="status-pill {{ r.status | lower | replace(' ', '-') }}">
-									{{ r.status }}
-								</span>
-								{% if r.insurance_claim_status %}
-								<div style="margin-top: 0.5rem;">
-									<span class="status-pill" style="background:#fef3c7; color:#92400e; font-size: 0.65rem; padding: 0.2rem 0.5rem; border:1px solid #fde68a; white-space: nowrap;">
-										🛡️ {{ r.insurance_claim_status }}
-									</span>
-								</div>
-								{% endif %}
-								{% if r.paint_job_status %}
-								<div style="margin-top: 0.5rem;">
-									<span class="status-pill" style="background:#e0e7ff; color:#3730a3; font-size: 0.65rem; padding: 0.2rem 0.5rem; border:1px solid #c7d2fe; white-space: nowrap;">
-										🎨 Paint: {{ r.paint_job_status }}
-									</span>
-								</div>
-								{% endif %}
-								{% if r.inspection_report %}
-								<div style="margin-top: 0.5rem;">
-									<span class="status-pill" style="background:#ecfdf5; color:#065f46; font-size: 0.65rem; padding: 0.2rem 0.5rem; border:1px solid #a7f3d0; white-space: nowrap;">
-										🔍 DVI: {{ r.inspection_condition }}
-									</span>
-								</div>
-								{% endif %}
-							</td>
-							<td class="action-cell">
-								<select onchange="updateAdminStatus('{{ r.name }}', this.value)">
-									<option value="" disabled selected>Update...</option>
-									{% set statuses = ["Pending", "Quoted", "Approved", "Repairing", "Repairing Done", "Released"] %}
-									{% for st in statuses %}
-									{% if r.status != st %}
-									<option value="{{ st }}">{{ st }}</option>
-									{% endif %}
-									{% endfor %}
-								</select>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				</div>
-				{% else %}
-				<div class="no-data">No requests found.</div>
-				{% endif %}
-			</div>
+            <!-- Recent Requests Section -->
+            <section class="bg-white rounded-[2rem] p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="font-headline text-xl font-extrabold text-primary">Recent Service Enquiries</h3>
+                        <p class="text-slate-500 text-sm">Action required for incoming requests</p>
+                    </div>
+                    <a href="/admin_dashboard?view=requests" class="flex items-center space-x-2 text-xs font-bold text-primary hover:opacity-70 transition-colors">
+                        <span>View All</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+                <div class="overflow-x-auto no-scrollbar">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                                <th class="pb-4 px-4">Customer</th>
+                                <th class="pb-4 px-4">Vehicle</th>
+                                <th class="pb-4 px-4">Issue</th>
+                                <th class="pb-4 px-4 text-center">Status</th>
+                                <th class="pb-4 px-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for r in recent_enquiries %}
+                            <tr class="group hover:bg-slate-50/50 transition-colors">
+                                <td class="py-5 px-4 text-sm font-semibold text-primary">{{ r.customer_name }}</td>
+                                <td class="py-5 px-4 text-sm font-bold text-secondary">{{ r.vehicle_name }}</td>
+                                <td class="py-5 px-4 text-xs text-on-surface-variant max-w-xs truncate">{{ r.problem_description }}</td>
+                                <td class="py-5 px-4 text-center">
+                                    <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter
+                                        {% if r.status == 'Pending' %}bg-orange-100 text-orange-700
+                                        {% elif r.status == 'Released' %}bg-green-100 text-green-700
+                                        {% else %}bg-blue-100 text-blue-700{% endif %}">
+                                        {{ r.status }}
+                                    </span>
+                                </td>
+                                <td class="py-5 px-4 text-right">
+                                    <a href="/desk#Form/Vehicle Service Request/{{ r.name }}" class="p-2 text-slate-400 hover:text-primary transition-colors">
+                                        <span class="material-symbols-outlined">open_in_new</span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% endif %}
 
-			{% elif view == 'feedback' %}
-			<h1>Feedback</h1>
-			<div class="table-card">
-				<div class="table-title">Customer Feedback</div>
-				{% if feedback %}
-				<div style="overflow-x: auto;">
-				<table>
-					<thead>
-						<tr>
-							<th>Date</th>
-							<th>Customer</th>
-							<th>Request ID</th>
-							<th>Rating</th>
-							<th>Comments</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for f in feedback %}
-						<tr>
-							<td>{{ frappe.utils.formatdate(f.creation) if f.creation else '-' }}</td>
-							<td>{{ f.customer_name }}</td>
-							<td><a href="/admin-dashboard?view=requests" style="color: var(--primary); font-weight: 500;">{{ f.service_request }}</a></td>
-							<td>
-								{% for i in range(f.rating | int) %}⭐{% endfor %}
-							</td>
-							<td>{{ f.comments or '' }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				</div>
-				{% else %}
-				<div class="no-data">No feedback found.</div>
-				{% endif %}
-			</div>
-			
-			{% elif view == 'equipment' %}
-			<h1>Workshop Equipment</h1>
-			<div class="table-card">
-				<div class="table-title">Equipment Roster</div>
-				{% if equipment %}
-				<div style="overflow-x: auto;">
-				<table>
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Name / Asset</th>
-							<th>Type</th>
-							<th>Status</th>
-							<th>Last Maintenance</th>
-							<th>Next Maintenance</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for e in equipment %}
-						<tr>
-							<td><strong>{{ e.name }}</strong></td>
-							<td>{{ e.equipment_name }}</td>
-							<td>{{ e.type }}</td>
-							<td>
-								<span class="status-pill {% if e.status == 'Available' %}released{% elif e.status == 'In Use' %}pending{% else %}rejected{% endif %}">
-									{{ e.status }}
-								</span>
-							</td>
-							<td>{{ e.last_maintenance_date or '-' }}</td>
-							<td>{{ e.next_maintenance_date or '-' }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-				</div>
-				{% else %}
-				<div class="no-data">No workshop equipment found. Add them via Desk!</div>
-				{% endif %}
-			</div>
+            {% if view == 'requests' %}
+            <!-- Service Requests View -->
+            <section class="bg-white rounded-[2rem] p-8 shadow-sm">
+                <h3 class="font-headline text-2xl font-black text-primary mb-8">All Service Requests</h3>
+                <div class="overflow-x-auto no-scrollbar">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                                <th class="pb-4 px-4">ID</th>
+                                <th class="pb-4 px-4">Customer</th>
+                                <th class="pb-4 px-4">Vehicle</th>
+                                <th class="pb-4 px-4">Status</th>
+                                <th class="pb-4 px-4">Payment</th>
+                                <th class="pb-4 px-4 text-right">Link</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for r in requests %}
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-4 text-xs font-bold text-slate-500">{{ r.name }}</td>
+                                <td class="py-4 px-4 text-sm font-bold text-primary">{{ r.customer_name }}</td>
+                                <td class="py-4 px-4 text-sm text-secondary">{{ r.vehicle_name }}</td>
+                                <td class="py-4 px-4">
+                                    <span class="text-[10px] font-bold uppercase px-2 py-1 rounded bg-slate-100">{{ r.status }}</span>
+                                </td>
+                                <td class="py-4 px-4">
+                                    <span class="text-[10px] font-bold uppercase px-2 py-1 rounded {% if r.payment_status == 'Paid' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                        {{ r.payment_status }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-right">
+                                    <a href="/desk#Form/Vehicle Service Request/{{ r.name }}" class="text-primary hover:underline font-bold text-xs uppercase">Open Desk</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% endif %}
 
-			{% endif %}
-		</main>
-	</div>
+            {% if view == 'mechanics' %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for m in mechanics %}
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary">engineering</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-primary">{{ m.mechanic_name }}</h4>
+                            <span class="text-[10px] font-bold uppercase text-slate-400 tracking-widest">{{ m.status }}</span>
+                        </div>
+                    </div>
+                    <a href="/desk#Form/Vehicle Mechanic/{{ m.name }}" class="block text-center py-2 bg-slate-50 rounded-xl text-xs font-bold text-primary hover:bg-primary hover:text-white transition-all">Profile Details</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if view == 'equipment' %}
+            <section class="bg-white rounded-[2rem] p-8 shadow-sm">
+                <h3 class="font-headline text-2xl font-black text-primary mb-8">Workshop Equipment</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for e in equipment %}
+                    <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100 relative group overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="p-3 bg-white w-fit rounded-xl mb-4 shadow-sm text-primary">
+                                <span class="material-symbols-outlined">precision_manufacturing</span>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1">{{ e.equipment_name }}</h4>
+                            <p class="text-xs text-secondary mb-4">{{ e.type }}</p>
+                            <div class="flex justify-between items-center text-[10px] font-bold uppercase">
+                                <span class="{% if e.status == 'Available' %}text-green-600{% else %}text-error{% endif %}">{{ e.status }}</span>
+                                <span class="text-slate-400">Next Maint: {{ e.next_maintenance_date or '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+            
+            {% if view == 'feedback' %}
+            <div class="space-y-4">
+                {% for f in feedback %}
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
+                                {{ f.customer_name[0] }}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary">{{ f.customer_name }}</h4>
+                                <p class="text-[10px] text-slate-400 font-medium">{{ f.creation.split(' ')[0] }}</p>
+                            </div>
+                        </div>
+                        <div class="flex text-yellow-400">
+                            {% for i in range(f.rating | int) %}<span class="material-symbols-outlined text-sm material-fill">star</span>{% endfor %}
+                        </div>
+                    </div>
+                    <p class="text-sm text-secondary italic">"{{ f.comments }}"</p>
+                    <p class="text-[10px] font-bold text-primary-container mt-4 uppercase tracking-widest">Request: {{ f.service_request }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </main>
 </div>
 
 <script>
-function updateAdminStatus(reqName, newStatus) {
-	if (!confirm('Change status of ' + reqName + ' to ' + newStatus + '?')) {
-		window.location.reload();
-		return;
-	}
-	
-	frappe.call({
-		method: 'vehicle_service_management.api.update_request_status',
-		args: { request_name: reqName, new_status: newStatus },
-		callback: function(r) {
-			if (r.message && r.message.status === 'success') {
-				window.location.reload();
-			}
-		},
-		error: function(err) {
-			alert('Failed to update status.');
-			window.location.reload();
-		}
-	});
-}
+    function updateAdminStatus(requestId, newStatus) {
+        frappe.call({
+            method: 'frappe.client.set_value',
+            args: {
+                doctype: 'Vehicle Service Request',
+                name: requestId,
+                fieldname: 'status',
+                value: newStatus
+            },
+            callback: function(r) {
+                if(!r.exc) {
+                    window.location.reload();
+                }
+            }
+        });
+    }
 </script>
 {% endblock %}
