@@ -2,6 +2,5 @@
  "app_name": "vehicle_service_management",
  "doctype": "Module Def",
  "module_name": "Vehicle Service Management",
- "name": "Vehicle Service Management",
- "package": "Vehicle Service Management"
+ "name": "Vehicle Service Management"
 }
