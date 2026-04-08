@@ -1,8 +1,8 @@
 {
 	"vehicle_service_management/css/vehicle_service_management.bundle.css": [
-		"public/css/vehicle_service_management.css"
+		"css/vehicle_service_management.css"
 	],
 	"vehicle_service_management/js/vehicle_service_management.bundle.js": [
-		"public/js/vehicle_service_management.js"
+		"js/vehicle_service_management.js"
 	]
 }
