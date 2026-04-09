@@ -38,6 +38,12 @@
    "type": "Link"
   },
   {
+   "label": "Vehicle Service Bay",
+   "link_to": "Vehicle Service Bay",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
    "label": "Service Workflow",
    "type": "Card Break",
    "link_type": "",
@@ -58,6 +64,18 @@
   {
    "label": "Paint Job Card",
    "link_to": "Paint Job Card",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "label": "Vehicle Delivery Checklist",
+   "link_to": "Vehicle Delivery Checklist",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "label": "Consumed Spare",
+   "link_to": "Consumed Spare",
    "link_type": "DocType",
    "type": "Link"
   },
@@ -86,16 +104,16 @@
    "type": "Link"
   },
   {
+   "label": "Loyalty Point Entry",
+   "link_to": "Loyalty Point Entry",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
    "label": "Dashboards & Portals",
    "type": "Card Break",
    "link_type": "",
    "icon": "layout"
-  },
-  {
-   "label": "Request Dashboard",
-   "link_to": "Vehicle Service Request",
-   "link_type": "DocType",
-   "type": "Link"
   },
   {
    "label": "Service Tracking",
@@ -104,13 +122,13 @@
    "type": "Link"
   },
   {
-   "label": "Workshop Assets",
-   "link_to": "Workshop Equipment",
+   "label": "EV Battery Health",
+   "link_to": "EV Battery Health",
    "link_type": "DocType",
    "type": "Link"
   }
  ],
- "modified": "2024-03-26 00:00:00.000000",
+ "modified": "2026-04-09 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Vehicle Service Management",
  "name": "Vehicle Service Management",
@@ -151,6 +169,24 @@
    "label": "Mechanics",
    "link_to": "Vehicle Mechanic",
    "type": "DocType"
+  },
+  {
+   "label": "Admin Dashboard",
+   "url": "/app/admin-dashboard",
+   "link_type": "URL",
+   "type": "Link"
+  },
+  {
+   "label": "Mechanic Dashboard",
+   "url": "/app/mechanic-dashboard",
+   "link_type": "URL",
+   "type": "Link"
+  },
+  {
+   "label": "Book Service",
+   "url": "/app/book-service",
+   "link_type": "URL",
+   "type": "Link"
   }
  ],
  "title": "Vehicle Service Management"
