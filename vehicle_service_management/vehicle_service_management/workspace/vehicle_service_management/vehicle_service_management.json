@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Requests\",\"link_to\":\"Vehicle Service Request\",\"color\":\"Green\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vehicle Master\",\"link_to\":\"Vehicle Master\",\"color\":\"Blue\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Insurance Claims\",\"link_to\":\"Insurance Claim\",\"color\":\"Red\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Digital Inspections\",\"link_to\":\"Vehicle Inspection\",\"color\":\"Orange\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Paint Job Cards\",\"link_to\":\"Paint Job Card\",\"color\":\"Purple\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inventory Packages\",\"link_to\":\"Service Package\",\"color\":\"Yellow\",\"col\":4}}]",
+ "content": "[{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Requests\",\"link_to\":\"Vehicle Service Request\",\"color\":\"Green\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vehicle Master\",\"link_to\":\"Vehicle Master\",\"color\":\"Blue\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Insurance Claims\",\"link_to\":\"Insurance Claim\",\"color\":\"Red\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Digital Inspections\",\"link_to\":\"Vehicle Inspection\",\"color\":\"Orange\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Paint Job Cards\",\"link_to\":\"Paint Job Card\",\"color\":\"Purple\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inventory Packages\",\"link_to\":\"Service Package\",\"color\":\"Yellow\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vehicle Mechanic\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vehicle Service Feedback\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Admin Dashboard\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Mechanic Dashboard\",\"col\":4}}]",
  "creation": "2024-03-20 00:00:00.000000",
  "custom_blocks": [],
  "doctype": "Workspace",
@@ -92,6 +92,34 @@
    "link_to": "Vehicle Service Feedback",
    "link_type": "DocType",
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Admin Dashboard",
+   "link_to": "/admin-dashboard",
+   "link_type": "URL",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Mechanic Dashboard",
+   "link_to": "/mechanic-dashboard",
+   "link_type": "URL",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Book Service",
+   "link_to": "/book-service",
+   "link_type": "URL",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "label": "Service Tracking",
+   "link_to": "/service-tracking",
+   "link_type": "URL",
+   "type": "Link"
   }
  ],
  "modified": "2024-03-26 00:00:00.000000",
@@ -145,6 +173,32 @@
    "doc_view": "List",
    "label": "Inventory Packages",
    "link_to": "Service Package",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Admin Dashboard",
+   "link_to": "/admin-dashboard",
+   "type": "URL"
+  },
+  {
+   "color": "Grey",
+   "label": "Mechanic Dashboard",
+   "link_to": "/mechanic-dashboard",
+   "type": "URL"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Vehicle Mechanic",
+   "link_to": "Vehicle Mechanic",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Vehicle Service Feedback",
+   "link_to": "Vehicle Service Feedback",
    "type": "DocType"
   }
  ],
