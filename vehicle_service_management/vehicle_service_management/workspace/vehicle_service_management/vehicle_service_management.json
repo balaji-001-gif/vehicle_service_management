@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"type\":\"card\",\"data\":{\"card_name\":\"Vehicle & Workshop Assets\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Service Workflow\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Support & Feedback\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Quality Check\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"label\":\"Admin Dashboard\",\"url\":\"/app/admin-dashboard\",\"link_type\":\"URL\",\"icon\":\"layout\"}},{\"type\":\"shortcut\",\"data\":{\"label\":\"Mechanic Dashboard\",\"url\":\"/app/mechanic-dashboard\",\"link_type\":\"URL\",\"icon\":\"layout\"}},{\"type\":\"shortcut\",\"data\":{\"label\":\"Book Service\",\"url\":\"/app/book-service\",\"link_type\":\"URL\",\"icon\":\"book-open\"}}]",
+ "content": "[{\"type\":\"card\",\"data\":{\"card_name\":\"Vehicle & Workshop Assets\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Service Workflow\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Support & Feedback\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Quality Check\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"label\":\"Admin Dashboard\",\"url\":\"/admin-dashboard\",\"link_type\":\"URL\",\"icon\":\"layout\"}},{\"type\":\"shortcut\",\"data\":{\"label\":\"Mechanic Dashboard\",\"url\":\"/mechanic-dashboard\",\"link_type\":\"URL\",\"icon\":\"layout\"}},{\"type\":\"shortcut\",\"data\":{\"label\":\"Book Service\",\"url\":\"/book-service\",\"link_type\":\"URL\",\"icon\":\"book-open\"}}]",
  "creation": "2024-03-20 00:00:00.000000",
  "custom_blocks": [],
  "doctype": "Workspace",
@@ -110,7 +110,7 @@
    "type": "Link"
   },
   {
-   "label": "Dashboards & Portals",
+   "label": "Quality Check",
    "type": "Card Break",
    "link_type": "",
    "icon": "layout"
@@ -148,17 +148,17 @@
  "shortcuts": [
   {
    "label": "Admin Dashboard",
-   "url": "/app/admin-dashboard",
+   "url": "/admin-dashboard",
    "type": "URL"
   },
   {
    "label": "Mechanic Dashboard",
-   "url": "/app/mechanic-dashboard",
+   "url": "/mechanic-dashboard",
    "type": "URL"
   },
   {
    "label": "Book Service",
-   "url": "/app/book-service",
+   "url": "/book-service",
    "type": "URL"
   }
  ],
