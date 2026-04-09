@@ -92,27 +92,21 @@
    "icon": "layout"
   },
   {
-   "label": "Admin Dashboard",
-   "link_to": "/admin-dashboard",
-   "link_type": "",
-   "type": "Link"
-  },
-  {
-   "label": "Mechanic Dashboard",
-   "link_to": "/mechanic-dashboard",
-   "link_type": "",
+   "label": "Request Dashboard",
+   "link_to": "Vehicle Service Request",
+   "link_type": "DocType",
    "type": "Link"
   },
   {
    "label": "Service Tracking",
-   "link_to": "/service-tracking",
-   "link_type": "",
+   "link_to": "Vehicle Service Trip",
+   "link_type": "DocType",
    "type": "Link"
   },
   {
-   "label": "Book Service",
-   "link_to": "/book-service",
-   "link_type": "",
+   "label": "Workshop Assets",
+   "link_to": "Workshop Equipment",
+   "link_type": "DocType",
    "type": "Link"
   }
  ],
@@ -144,17 +138,19 @@
   },
   {
    "color": "#185FA5",
-   "icon": "dashboard",
-   "label": "Admin Panel",
-   "url": "/admin-dashboard",
-   "type": "URL"
+   "doc_view": "List",
+   "icon": "car",
+   "label": "Vehicles",
+   "link_to": "Vehicle Master",
+   "type": "DocType"
   },
   {
    "color": "#D35400",
-   "icon": "calendar",
-   "label": "Book Now",
-   "url": "/book-service",
-   "type": "URL"
+   "doc_view": "List",
+   "icon": "users",
+   "label": "Mechanics",
+   "link_to": "Vehicle Mechanic",
+   "type": "DocType"
   }
  ],
  "title": "Vehicle Service Management"
