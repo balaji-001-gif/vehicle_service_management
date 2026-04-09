@@ -11,7 +11,7 @@
  "is_default": 1,
  "is_hidden": 0,
  "is_standard": 1,
- "label": "Vehicle Service Portal",
+ "label": "Vehicle Service Management",
  "links": [
   {
    "label": "Vehicle & Workshop Assets",
@@ -113,7 +113,7 @@
  "modified": "2024-03-26 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Vehicle Service Management",
- "name": "Vehicle Service Portal",
+ "name": "Vehicle Service Management",
  "owner": "Administrator",
  "parent_page": "",
  "public": 1,
@@ -153,5 +153,5 @@
    "type": "DocType"
   }
  ],
- "title": "Vehicle Service Portal"
+ "title": "Vehicle Service Management"
 }
