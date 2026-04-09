@@ -116,24 +116,6 @@
    "icon": "layout"
   },
   {
-   "label": "Admin Dashboard",
-   "link_to": "/app/admin-dashboard",
-   "link_type": "URL",
-   "type": "Link"
-  },
-  {
-   "label": "Mechanic Dashboard",
-   "link_to": "/app/mechanic-dashboard",
-   "link_type": "URL",
-   "type": "Link"
-  },
-  {
-   "label": "Book Service",
-   "link_to": "/app/book-service",
-   "link_type": "URL",
-   "type": "Link"
-  },
-  {
    "label": "Service Tracking",
    "link_to": "Vehicle Service Trip",
    "link_type": "DocType",
@@ -187,6 +169,24 @@
    "label": "Mechanics",
    "link_to": "Vehicle Mechanic",
    "type": "DocType"
+  },
+  {
+   "label": "Admin Dashboard",
+   "url": "/app/admin-dashboard",
+   "link_type": "URL",
+   "type": "Link"
+  },
+  {
+   "label": "Mechanic Dashboard",
+   "url": "/app/mechanic-dashboard",
+   "link_type": "URL",
+   "type": "Link"
+  },
+  {
+   "label": "Book Service",
+   "url": "/app/book-service",
+   "link_type": "URL",
+   "type": "Link"
   }
  ],
  "title": "Vehicle Service Management"
