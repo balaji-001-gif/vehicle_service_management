@@ -94,25 +94,25 @@
   {
    "label": "Admin Dashboard",
    "link_to": "/admin-dashboard",
-   "link_type": "URL",
+   "link_type": "",
    "type": "Link"
   },
   {
    "label": "Mechanic Dashboard",
    "link_to": "/mechanic-dashboard",
-   "link_type": "URL",
+   "link_type": "",
    "type": "Link"
   },
   {
    "label": "Service Tracking",
    "link_to": "/service-tracking",
-   "link_type": "URL",
+   "link_type": "",
    "type": "Link"
   },
   {
    "label": "Book Service",
    "link_to": "/book-service",
-   "link_type": "URL",
+   "link_type": "",
    "type": "Link"
   }
  ],
@@ -146,14 +146,14 @@
    "color": "#185FA5",
    "icon": "dashboard",
    "label": "Admin Panel",
-   "link_to": "/admin-dashboard",
+   "url": "/admin-dashboard",
    "type": "URL"
   },
   {
    "color": "#D35400",
    "icon": "calendar",
    "label": "Book Now",
-   "link_to": "/book-service",
+   "url": "/book-service",
    "type": "URL"
   }
  ],
