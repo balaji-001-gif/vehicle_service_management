@@ -147,46 +147,19 @@
  "sequence_id": 1,
  "shortcuts": [
   {
-   "color": "#0F6E56",
-   "doc_view": "List",
-   "icon": "plus",
-   "label": "New Request",
-   "link_to": "Vehicle Service Request",
-   "type": "DocType"
-  },
-  {
-   "color": "#185FA5",
-   "doc_view": "List",
-   "icon": "car",
-   "label": "Vehicles",
-   "link_to": "Vehicle Master",
-   "type": "DocType"
-  },
-  {
-   "color": "#D35400",
-   "doc_view": "List",
-   "icon": "users",
-   "label": "Mechanics",
-   "link_to": "Vehicle Mechanic",
-   "type": "DocType"
-  },
-  {
    "label": "Admin Dashboard",
    "url": "/app/admin-dashboard",
-   "link_type": "URL",
-   "type": "Link"
+   "type": "URL"
   },
   {
    "label": "Mechanic Dashboard",
    "url": "/app/mechanic-dashboard",
-   "link_type": "URL",
-   "type": "Link"
+   "type": "URL"
   },
   {
    "label": "Book Service",
    "url": "/app/book-service",
-   "link_type": "URL",
-   "type": "Link"
+   "type": "URL"
   }
  ],
  "title": "Vehicle Service Management"
