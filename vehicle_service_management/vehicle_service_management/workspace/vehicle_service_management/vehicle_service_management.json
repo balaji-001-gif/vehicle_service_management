@@ -43,7 +43,6 @@
    "link_type": "DocType",
    "type": "Link"
   },
-
   {
    "label": "Service Workflow",
    "type": "Card Break",
@@ -80,7 +79,6 @@
    "link_type": "DocType",
    "type": "Link"
   },
-
   {
    "label": "Support & Feedback",
    "type": "Card Break",
@@ -111,7 +109,6 @@
    "link_type": "DocType",
    "type": "Link"
   },
-
   {
    "label": "Dashboards & Portals",
    "type": "Card Break",
@@ -120,19 +117,19 @@
   },
   {
    "label": "Admin Dashboard",
-   "link_to": "/app/admin-dashboard",        // Change to your actual page/route
+   "link_to": "/app/admin-dashboard",
    "link_type": "URL",
    "type": "Link"
   },
   {
    "label": "Mechanic Dashboard",
-   "link_to": "/app/mechanic-dashboard",     // Change to your actual page/route
+   "link_to": "/app/mechanic-dashboard",
    "link_type": "URL",
    "type": "Link"
   },
   {
    "label": "Book Service",
-   "link_to": "/app/book-service",           // Change according to your page name
+   "link_to": "/app/book-service",
    "link_type": "URL",
    "type": "Link"
   },
