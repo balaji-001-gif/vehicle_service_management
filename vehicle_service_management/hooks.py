@@ -24,12 +24,12 @@ guest_title = "Vehicle Service Management"
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/vehicle_service_management/css/vehicle_service_management.css"
-app_include_js = "/assets/vehicle_service_management/js/vehicle_service_management.js"
+# app_include_css = "/assets/vehicle_service_management/css/vehicle_service_management.css"
+# app_include_js = "/assets/vehicle_service_management/js/vehicle_service_management.js"
 
 # include js, css files in header of web template
-web_include_css = "/assets/vehicle_service_management/css/vehicle_service_management.css"
-web_include_js = "/assets/vehicle_service_management/js/vehicle_service_management.js"
+# web_include_css = "/assets/vehicle_service_management/css/vehicle_service_management.css"
+# web_include_js = "/assets/vehicle_service_management/js/vehicle_service_management.js"
 
 # Installation
 # ------------
